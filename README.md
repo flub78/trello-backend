@@ -22,7 +22,9 @@ It is a REST API for boards, lists and tasks.
 ### Creating a Laravel Project
 
   composer create-project laravel/laravel lara-trello
+  
   cd lara-trello
+  
   php artisan serve
 
 If php artisan serve does not work, use the Apache server. 
