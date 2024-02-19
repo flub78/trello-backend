@@ -4,12 +4,6 @@ Laravel backend for the Trello project
 
 It is a REST API for boards, lists and tasks.
 
-## REST API
-
-## Database schema
-
-## Deployment
-
 ## Development steps
 
 - Create the github project
@@ -49,6 +43,100 @@ php artisan migrate
 
     composer require laravel/breeze --dev
     php artisan breeze:install
+
+## REST API
+
+/boards should return something like
+
+```json
+{
+    "boards": [
+        {
+            "id:": "webapp",
+            "name": "WEBAPP",
+            "description": "Workspace Flub78",
+            "favorite": true,
+            "recent": true,
+            "href": "board/webapp",
+            "image": "code_editor.jpg",
+            "theme": "dark"
+        },
+        {
+            "id": "marly",
+            "name": "Marly",
+            "description": "",
+            "favorite": false,
+            "recent": false,
+            "href": "board/marly",
+            "image": "IMG_20181118_152709.jpg",
+            "theme": "dark"
+        }
+    ]
+}
+```
+
+/lists?board=webapp     should return something like
+```json
+{
+    [
+        {"name": "todo", "description": "Thing to do"},
+        {"name": "done", "description": "completed tasks"}
+    ]
+}
+```
+
+/tasks
+/tasks?board=webapp
+/tasks?board=webapp&list=todo
+
+
+## Database schema
+
+````
+boards
+    id
+    name
+    background_color
+    background_url
+
+lists
+    id=todo
+    board="webapp"
+
+tasks
+    id
+    board
+    list
+    title
+    description
+    image
+    creation_date
+    due_date
+    estimate
+
+checklists
+    id
+    task
+
+check_items
+    id
+    checklist
+    description
+    checked
+
+color_tags
+    id
+    name
+    color
+
+set_color_tags
+    id
+    task
+    color_tag
+
+````
+
+## Deployment
 
 ## Design questions
 
