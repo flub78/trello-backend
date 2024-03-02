@@ -12,8 +12,11 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "api" middleware group. Make something great!
 |
-*/
+ */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// http: //127.0.0.1:8000/api/boards
+Route::get('/boards', 'App\Http\Controllers\api\BoardController@index');

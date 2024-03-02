@@ -4,12 +4,29 @@ Laravel backend for the Trello project
 
 It is a REST API for boards, lists and tasks.
 
+## Execution
+
+in development:
+
+    XAMPP
+        Start Apache with PHP 8 support
+        Start MySql
+
+    cd lara-trello
+    php artisan serve
+
+The project is available at http://127.0.0.1:8000/
+
+It is then possible to register new users and login. 
+
+(Todo chack how to disable registration.)
+
 ## Development steps
 
-- Create the github project
+- Create the github project (no files)
 - Create a local Laravel project
 - Test the local Laravel server
-- Merge the Laravel and Github projects to check it in
+- Merge the Laravel and Github projects to check it in (instructions on the Github site.)
 - Create the database
 - Implement the REST API
 - Add authentication
@@ -17,16 +34,15 @@ It is a REST API for boards, lists and tasks.
 ### Creating a Laravel Project
 
     composer create-project laravel/laravel lara-trello
-    cd lara-trello
-    php artisan serve
+
 
 Warning, the PHP and composer version need to be compatible with the Laravel version.
 
 ### Clone the github project
 
-git clone https://github.com/flub78/trello-backend.git
+See the github instructions on the new Github project to declare it as remote source.
 
-copy the Laravel project into the github project, except the README.md.
+Commit the project into Github.
 
 ### Create a database
 
@@ -43,6 +59,21 @@ php artisan migrate
 
     composer require laravel/breeze --dev
     php artisan breeze:install
+
+### To disable registration
+
+Remove from Auth file
+
+    Route::get('register', [RegisteredUserController::class, 'create'])
+        ->name('register');
+
+    Route::post('register', [RegisteredUserController::class, 'store']);
+
+Remove the controller in app/Http/Controllers/Auth/RegisteredUserController.php
+
+Remove the view resources/views/auth/register.blade.php.
+
+
 
 ## REST API
 
@@ -141,3 +172,21 @@ set_color_tags
 ## Design questions
 
 - Should I add a GUI to manage users and generate authentication tokens ?
+
+## Create the REST API server
+
+    php artisan make:migration create_boards_table
+
+it creates the file app/database/migrations/2024_03_02_174125_create_boards_table.php
+
+
+    php artisan migrate
+
+    php artisan make:model Board
+
+    ...\app\Models\Board.php] created successfully.
+
+
+    php artisan make:controller api/BoardController
+
+    ...\app\Http\Controllers\api\BoardController.php] created successfully.
