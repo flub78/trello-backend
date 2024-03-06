@@ -11,14 +11,15 @@ class Board extends Model
 
     protected $table = 'boards';
 
-    protected $fillable = [
-        'name',
-        'description',
-        'email',
-        'favorite',
-        'read_at',
-        'href',
-        'image',
-        'theme',
-    ];
+    protected $guarded = ['id', 'read_at', 'created_at', 'updated_at'];
+    // protected $fillable = [
+    //     'name',
+    //     'description',
+    //     'email',
+    //     'favorite',
+    //     'read_at',
+    //     'href',
+    //     'image',
+    //     'theme',
+    // ];
 }

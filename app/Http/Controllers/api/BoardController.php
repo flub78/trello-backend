@@ -4,6 +4,8 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Board;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BoardController extends Controller
 {
@@ -11,6 +13,8 @@ class BoardController extends Controller
 
     public function index()
     {
+        Log::Debug('BoardController@index');
+
         $boards = Board::all();
 
         $data = [
@@ -23,6 +27,8 @@ class BoardController extends Controller
 
     public function show($id)
     {
+        Log::Debug("BoardController@show $id");
+
         $board = Board::find($id);
 
         $data = [
@@ -35,26 +41,31 @@ class BoardController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required',
-            'description' => '',
-            'email' => 'email',
-            'favorite' => 'required|boolean',
-            'read_at' => 'date',
-            'href' => 'url',
-            'image' => '',
-            'theme' => 'in:light,dark',
-        ]);
+        Log::Debug('BoardController@store');
 
-        if ($validated->fails()) {
-            $data = [
-                'status' => 422,
-                'errors' => $validated->errors(),
-                'message' => 'Validation failed',
-            ];
+        // $validated = $request->validate([
+        //     'name' => 'required',
+        //     'description' => '',
+        //     'email' => 'email',
+        //     'favorite' => 'required|boolean',
+        //     'read_at' => 'date',
+        //     'href' => '',
+        //     'image' => '',
+        //     'theme' => 'in:light,dark',
+        // ]);
 
-            return response()->json($data, 422);
-        }
+        // Log::Debug('BoardController@store $validated created');
+
+        // if ($validated->fails()) {
+        //     $data = [
+        //         'status' => 422,
+        //         'errors' => $validated->errors(),
+        //         'message' => 'Validation failed',
+        //     ];
+        //     Log::Debug('BoardController@store $validated fails');
+
+        //     return response()->json($data, 422);
+        // }
 
         $board = new Board;
         $board->name = $request->name;
@@ -65,7 +76,11 @@ class BoardController extends Controller
         $board->href = $request->href;
         $board->image = $request->image;
         $board->theme = $request->theme;
+
+        Log::Debug('BoardController@store $board created');
+
         $board->save();
+        Log::Debug('BoardController@store $board saved');
 
         $data = [
             'status' => 200,
@@ -77,6 +92,8 @@ class BoardController extends Controller
 
     public function update(Request $request, $id)
     {
+        Log::Debug("BoardController@update $id");
+
         $board = Board::find($id);
 
         $validated = $request->validate([
@@ -120,6 +137,8 @@ class BoardController extends Controller
 
     public function destroy($id)
     {
+        Log::Debug("BoardController@delete $id");
+
         $board = Board::find($id);
 
         if (!$board) {

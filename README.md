@@ -53,7 +53,7 @@ password yyy
 copy the database credentiel into the .env file
 and migrate the database
 
-php artisan migrate
+    php artisan migrate
 
 ### Setup the authentication
 
@@ -190,3 +190,10 @@ it creates the file app/database/migrations/2024_03_02_174125_create_boards_tabl
     php artisan make:controller api/BoardController
 
     ...\app\Http\Controllers\api\BoardController.php] created successfully.
+
+
+## REST API
+
+    http://127.0.0.1:8000/api/boards
+
+    
