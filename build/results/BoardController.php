@@ -69,14 +69,14 @@ class BoardController extends Controller
         Log::Debug('BoardController@store');
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'description' => '',
-            'email' => 'email|required',
-            'favorite' => 'required|boolean',
-            'read_at' => 'date',
-            'href' => '',
-            'image' => '',
-            'theme' => 'in:light,dark',
+            "name" => 'required|string|max:128',
+			"description" => 'string|max:255',
+			"email" => 'required|string|max:255|email',
+			"favorite" => 'required|boolean',
+			"href" => 'string|max:255',
+			"image" => 'string|max:255',
+			"theme" => 'in:light,dark',
+
         ]);
 
         if ($validator->fails()) {
@@ -90,21 +90,21 @@ class BoardController extends Controller
             return response()->json($data, 422);
         }
 
-        $board = new Board;
-        $board->name = $request->name;
-        $board->description = $request->description;
-        $board->email = $request->email;
-        $board->favorite = $request->favorite;
-        $board->read_at = $request->read_at;
-        $board->href = $request->href;
-        $board->image = $request->image;
-        $board->theme = $request->theme;
+        $element = new Board;
+        $element->name = $request->name;
+		$element->description = $request->description;
+		$element->email = $request->email;
+		$element->favorite = $request->favorite;
+		$element->href = $request->href;
+		$element->image = $request->image;
+		$element->theme = $request->theme;
 
-        $board->save();
+
+        $element->save();
 
         $data = [
             'status' => 200,
-            'board' => $board,
+            'board' => $element,
         ];
         Log::Debug('BoardController@store saved in database', $data);
         return response()->json($data, 200);
@@ -118,14 +118,14 @@ class BoardController extends Controller
         Log::Debug("BoardController@update $id");
 
         $validator = Validator::make($request->all(), [
-            'name' => 'string|max:255',
-            'description' => '',
-            'email' => 'email',
-            'favorite' => 'boolean',
-            'read_at' => 'date',
-            'href' => '',
-            'image' => '',
-            'theme' => 'in:light,dark',
+            "name" => 'string|max:128',
+			"description" => 'string|max:255',
+			"email" => 'string|max:255|email',
+			"favorite" => 'boolean',
+			"href" => 'string|max:255',
+			"image" => 'string|max:255',
+			"theme" => 'in:light,dark',
+
         ]);
 
         if ($validator->fails()) {
@@ -139,9 +139,9 @@ class BoardController extends Controller
             return response()->json($data, 422);
         }
 
-        $board = Board::find($id);
+        $element = Board::find($id);
 
-        if (!$board) {
+        if (!$element) {
             $data = [
                 'status' => 404,
                 'message' => 'Board not found',
@@ -150,19 +150,19 @@ class BoardController extends Controller
             return response()->json($data, 404);
         }
 
-        $board->name = $request->name;
-        $board->description = $request->description;
-        $board->email = $request->email;
-        $board->favorite = $request->favorite;
-        $board->read_at = $request->read_at;
-        $board->href = $request->href;
-        $board->image = $request->image;
-        $board->theme = $request->theme;
-        $board->save();
+        $element->name = $request->name if "name" in $request;
+		$element->description = $request->description if "description" in $request;
+		$element->email = $request->email if "email" in $request;
+		$element->favorite = $request->favorite if "favorite" in $request;
+		$element->href = $request->href if "href" in $request;
+		$element->image = $request->image if "image" in $request;
+		$element->theme = $request->theme if "theme" in $request;
+
+        $element->save();
 
         $data = [
             'status' => 200,
-            'board' => $board,
+            'board' => $element,
         ];
 
         return response()->json($data, 200);
@@ -175,9 +175,9 @@ class BoardController extends Controller
     {
         Log::Debug("BoardController@delete $id");
 
-        $board = Board::find($id);
+        $element = Board::find($id);
 
-        if (!$board) {
+        if (!$element) {
             $data = [
                 'status' => 404,
                 'message' => 'Board not found',
@@ -186,7 +186,7 @@ class BoardController extends Controller
             return response()->json($data, 404);
         }
 
-        $board->delete();
+        $element->delete();
 
         $data = [
             'status' => 200,

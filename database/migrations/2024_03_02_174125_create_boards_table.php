@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::create('boards', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name', 128);
             $table->string('description')->nullable();
-            $table->string('email')->unique();
-            $table->boolean('favorite')->default(false)->comment('{"subtype": "checkbox"}');
-            $table->timestamp('read_at')->nullable();
+            $table->string('email', 128)->unique();
+            $table->boolean('favorite')->default(false)
+                ->comment('{"subtype": "boolean"}');
+            $table->timestamp('read_at')->nullable()
+                ->comment('{"fillable": "false"}');
             $table->string('href')->nullable();
             $table->string('image')->nullable();
-            $table->string('theme')->nullable();
+            $table->enum('theme', ['light', 'dark'])->default('light')->nullable();
 
             $table->timestamps();
         });
