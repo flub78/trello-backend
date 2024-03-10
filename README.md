@@ -176,11 +176,23 @@ set_color_tags
 ## Create the REST API server
 
     php artisan make:migration create_boards_table
+    php artisan make:migration create_lists_table
+    php artisan make:migration create_tasks_table
+    
+    php artisan make:migration create_comments_table
+    php artisan make:migration create_checklists_table
+    php artisan make:migration create_checklists_table
+    php artisan make:migration create_tag_colors_table
+    php artisan make:migration create_tags_table
+    php artisan make:migration create_checklist_items_table
+
 
 it creates the file app/database/migrations/2024_03_02_174125_create_boards_table.php
 
 
     php artisan migrate
+	php artisan migrate:rollback --step=1
+
 
     php artisan make:model Board
 
