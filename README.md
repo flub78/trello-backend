@@ -178,9 +178,8 @@ set_color_tags
     php artisan make:migration create_boards_table
     php artisan make:migration create_lists_table
     php artisan make:migration create_tasks_table
-    
-    php artisan make:migration create_comments_table
-    php artisan make:migration create_checklists_table
+
+    php artisan make:migration create_task_comments_table
     php artisan make:migration create_checklists_table
     php artisan make:migration create_tag_colors_table
     php artisan make:migration create_tags_table

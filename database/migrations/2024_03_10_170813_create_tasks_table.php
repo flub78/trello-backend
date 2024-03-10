@@ -17,11 +17,11 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->unsignedBigInteger('list_id')->required();
             $table->date('due_date')->nullable();
-            $table->boolean('completed')->default(false);
+            $table->boolean('completed')->default(false)->comment('{"subtype": "boolean"}');
             $table->string('image')->nullable();
             $table->string('href')->nullable();
-            $table->boolean('favorite')->default(false);
-            $table->boolean('watched')->default(false);
+            $table->boolean('favorite')->default(false)->comment('{"subtype": "boolean"}');
+            $table->boolean('watched')->default(false)->comment('{"subtype": "boolean"}');
             $table->timestamps();
 
             $table->foreign('list_id')->references('id')->on('lists')->onUpdate('cascade')->onDelete('cascade');
