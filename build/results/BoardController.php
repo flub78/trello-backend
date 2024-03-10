@@ -71,7 +71,7 @@ class BoardController extends Controller
         $validator = Validator::make($request->all(), [
             "name" => 'required|string|max:128',
 			"description" => 'string|max:255',
-			"email" => 'required|string|max:255|email',
+			"email" => 'required|string|max:128|email',
 			"favorite" => 'required|boolean',
 			"href" => 'string|max:255',
 			"image" => 'string|max:255',
@@ -120,7 +120,7 @@ class BoardController extends Controller
         $validator = Validator::make($request->all(), [
             "name" => 'string|max:128',
 			"description" => 'string|max:255',
-			"email" => 'string|max:255|email',
+			"email" => 'string|max:128|email',
 			"favorite" => 'boolean',
 			"href" => 'string|max:255',
 			"image" => 'string|max:255',
@@ -150,13 +150,27 @@ class BoardController extends Controller
             return response()->json($data, 404);
         }
 
-        $element->name = $request->name if "name" in $request;
-		$element->description = $request->description if "description" in $request;
-		$element->email = $request->email if "email" in $request;
-		$element->favorite = $request->favorite if "favorite" in $request;
-		$element->href = $request->href if "href" in $request;
-		$element->image = $request->image if "image" in $request;
-		$element->theme = $request->theme if "theme" in $request;
+        if ($request->name) {
+			$element->name = $request->name;
+		}
+		if ($request->description) {
+			$element->description = $request->description;
+		}
+		if ($request->email) {
+			$element->email = $request->email;
+		}
+		if ($request->favorite) {
+			$element->favorite = $request->favorite;
+		}
+		if ($request->href) {
+			$element->href = $request->href;
+		}
+		if ($request->image) {
+			$element->image = $request->image;
+		}
+		if ($request->theme) {
+			$element->theme = $request->theme;
+		}
 
         $element->save();
 

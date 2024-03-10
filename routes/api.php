@@ -21,3 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // http: //127.0.0.1:8000/api/boards
 // Route::get('/boards', 'App\Http\Controllers\api\BoardController@index');
 Route::resource('/boards', App\Http\Controllers\api\BoardController::class);
+Route::put('/boards/{id}/update', [App\Http\Controllers\api\BoardController::class, 'update']);
