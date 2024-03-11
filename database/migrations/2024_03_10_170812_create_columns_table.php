@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('lists', function (Blueprint $table) {
+        Schema::create('columns', function (Blueprint $table) {
             $table->id();
             $table->string('name', 128)->required();
             $table->unsignedBigInteger('board_id')->required();
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('lists');
+        Schema::dropIfExists('columns');
     }
 };

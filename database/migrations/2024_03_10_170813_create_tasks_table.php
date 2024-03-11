@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 128)->required();
             $table->text('description')->nullable();
-            $table->unsignedBigInteger('list_id')->required();
+            $table->unsignedBigInteger('column_id')->required();
             $table->date('due_date')->nullable();
             $table->boolean('completed')->default(false)->comment('{"subtype": "boolean"}');
             $table->string('image')->nullable();
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->boolean('watched')->default(false)->comment('{"subtype": "boolean"}');
             $table->timestamps();
 
-            $table->foreign('list_id')->references('id')->on('lists')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('column_id')->references('id')->on('columns')->onUpdate('cascade')->onDelete('cascade');
 
         });
     }
