@@ -71,7 +71,7 @@ class TaskCommentController extends Controller
         $validator = Validator::make($request->all(), [
             "text" => '',
 			"from_email" => 'required|string|max:128|email',
-			"task_id" => 'required',
+			"task_id" => 'required|exists:tasks,id',
 
         ]);
 
@@ -112,7 +112,7 @@ class TaskCommentController extends Controller
         $validator = Validator::make($request->all(), [
             "text" => '',
 			"from_email" => 'string|max:128|email',
-			"task_id" => '',
+			"task_id" => 'exists:tasks,id',
 
         ]);
 

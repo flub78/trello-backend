@@ -71,7 +71,7 @@ class TaskController extends Controller
         $validator = Validator::make($request->all(), [
             "name" => 'required|string|max:128',
 			"description" => '',
-			"list_id" => 'required',
+			"column_id" => 'required|exists:columns,id',
 			"due_date" => 'date',
 			"completed" => 'required|boolean',
 			"image" => 'string|max:255',
@@ -95,7 +95,7 @@ class TaskController extends Controller
         $element = new Task;
         $element->name = $request->name;
 		$element->description = $request->description;
-		$element->list_id = $request->list_id;
+		$element->column_id = $request->column_id;
 		$element->due_date = $request->due_date;
 		$element->completed = $request->completed;
 		$element->image = $request->image;
@@ -124,7 +124,7 @@ class TaskController extends Controller
         $validator = Validator::make($request->all(), [
             "name" => 'string|max:128',
 			"description" => '',
-			"list_id" => '',
+			"column_id" => 'exists:columns,id',
 			"due_date" => 'date',
 			"completed" => 'boolean',
 			"image" => 'string|max:255',
@@ -162,8 +162,8 @@ class TaskController extends Controller
 		if ($request->description) {
 			$element->description = $request->description;
 		}
-		if ($request->list_id) {
-			$element->list_id = $request->list_id;
+		if ($request->column_id) {
+			$element->column_id = $request->column_id;
 		}
 		if ($request->due_date) {
 			$element->due_date = $request->due_date;

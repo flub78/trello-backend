@@ -69,8 +69,8 @@ class TagController extends Controller
         Log::Debug('TagController@store');
 
         $validator = Validator::make($request->all(), [
-            "task_id" => 'required',
-			"task_color_id" => 'required',
+            "task_id" => 'required|exists:tasks,id',
+			"task_color_id" => 'required|exists:tag_colors,id',
 
         ]);
 
@@ -108,8 +108,8 @@ class TagController extends Controller
         Log::Debug("TagController@update $id");
 
         $validator = Validator::make($request->all(), [
-            "task_id" => '',
-			"task_color_id" => '',
+            "task_id" => 'exists:tasks,id',
+			"task_color_id" => 'exists:tag_colors,id',
 
         ]);
 

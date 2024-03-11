@@ -70,8 +70,8 @@ class ChecklistItemController extends Controller
 
         $validator = Validator::make($request->all(), [
             "description" => 'required|string|max:128',
-			"done" => 'required',
-			"checklist_id" => 'required',
+			"done" => 'required|boolean',
+			"checklist_id" => 'required|exists:checklists,id',
 
         ]);
 
@@ -111,8 +111,8 @@ class ChecklistItemController extends Controller
 
         $validator = Validator::make($request->all(), [
             "description" => 'string|max:128',
-			"done" => '',
-			"checklist_id" => '',
+			"done" => 'boolean',
+			"checklist_id" => 'exists:checklists,id',
 
         ]);
 

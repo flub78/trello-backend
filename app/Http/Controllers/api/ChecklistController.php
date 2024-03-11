@@ -71,7 +71,7 @@ class ChecklistController extends Controller
         $validator = Validator::make($request->all(), [
             "name" => 'required|string|max:128',
 			"description" => 'required|string|max:128',
-			"task_id" => 'required',
+			"task_id" => 'required|exists:tasks,id',
 
         ]);
 
@@ -112,7 +112,7 @@ class ChecklistController extends Controller
         $validator = Validator::make($request->all(), [
             "name" => 'string|max:128',
 			"description" => 'string|max:128',
-			"task_id" => '',
+			"task_id" => 'exists:tasks,id',
 
         ]);
 

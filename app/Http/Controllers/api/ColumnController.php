@@ -70,7 +70,7 @@ class ColumnController extends Controller
 
         $validator = Validator::make($request->all(), [
             "name" => 'required|string|max:128',
-			"board_id" => 'required',
+			"board_id" => 'required|exists:boards,id',
 
         ]);
 
@@ -109,7 +109,7 @@ class ColumnController extends Controller
 
         $validator = Validator::make($request->all(), [
             "name" => 'string|max:128',
-			"board_id" => '',
+			"board_id" => 'exists:boards,id',
 
         ]);
 
