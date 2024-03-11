@@ -21,16 +21,23 @@ class TagController extends Controller
      */
     public function index()
     {
+        try {
         Log::Debug('TagController@index');
 
         $elements = Tag::all(); // SELECT * FROM tags
 
+            return response()->json($elements, 200);
+        
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@index', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'tags' => $elements,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -38,27 +45,23 @@ class TagController extends Controller
      */
     public function show($id)
     {
+        try {
         Log::Debug("TagController@show $id");
 
-        $element = Tag::find($id); // SELECT * FROM tags WHERE id = $id
+            $element = Tag::findOrFail($id); // SELECT * FROM tags WHERE id = $id 
 
-        if (!$element) {
-            // 404 Not Found
-            $data = [
-                'status' => 404,
-                'message' => 'Tag not found',
-            ];
+            return response()->json($element, 200);
 
-            return response()->json($data, 404);
-        }
+        } catch (\Exception $e) {
 
-        // 200 OK
+            Log::Error('BoardController@show', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'tag' => $element,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
     }
 
     /**
@@ -66,6 +69,7 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
+        try {
         Log::Debug('TagController@store');
 
         $validator = Validator::make($request->all(), [
@@ -89,15 +93,26 @@ class TagController extends Controller
         $element->task_id = $request->task_id;
 		$element->task_color_id = $request->task_color_id;
 
+            $element->save();
 
-        $element->save();
 
         $data = [
             'status' => 200,
-            'tag' => $element,
+                'tag' => $element
         ];
         Log::Debug('TagController@store saved in database', $data);
-        return response()->json($data, 200);
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@store', ['message' => $e->getMessage()]);
+            $data = [
+                'status' => 500,
+                'error' => 'Internal Server Error',
+            ];
+
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -105,6 +120,7 @@ class TagController extends Controller
      */
     public function update(Request $request, int $id)
     {
+        try {
         Log::Debug("TagController@update $id");
 
         $validator = Validator::make($request->all(), [
@@ -124,17 +140,7 @@ class TagController extends Controller
             return response()->json($data, 422);
         }
 
-        $element = Tag::find($id);
-
-        if (!$element) {
-            $data = [
-                'status' => 404,
-                'message' => 'Tag not found',
-            ];
-
-            return response()->json($data, 404);
-        }
-
+            $element = Tag::findOrFail($id);
         if ($request->task_id) {
 			$element->task_id = $request->task_id;
 		}
@@ -144,12 +150,18 @@ class TagController extends Controller
 
         $element->save();
 
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@update', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'tag' => $element,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
     }
 
     /**
@@ -157,26 +169,30 @@ class TagController extends Controller
      */
     public function destroy($id)
     {
+        try {
         Log::Debug("TagController@delete $id");
 
-        $element = Tag::find($id);
+            $element = Tag::findOrFail($id);
 
-        if (!$element) {
+            $element->delete();
+
             $data = [
-                'status' => 404,
-                'message' => 'Tag not found',
+                'status' => 200,
+                'message' => "Tag $id deleted",
             ];
 
-            return response()->json($data, 404);
-        }
+            return response()->json($data, 200);
 
-        $element->delete();
+        } catch (\Exception $e) {
 
+            Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'message' => "Tag $id deleted",
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
+
     }
 }

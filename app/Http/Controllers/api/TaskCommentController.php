@@ -21,16 +21,23 @@ class TaskCommentController extends Controller
      */
     public function index()
     {
+        try {
         Log::Debug('TaskCommentController@index');
 
         $elements = TaskComment::all(); // SELECT * FROM task_comments
 
+            return response()->json($elements, 200);
+        
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@index', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'task_comments' => $elements,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -38,27 +45,23 @@ class TaskCommentController extends Controller
      */
     public function show($id)
     {
+        try {
         Log::Debug("TaskCommentController@show $id");
 
-        $element = TaskComment::find($id); // SELECT * FROM task_comments WHERE id = $id
+            $element = TaskComment::findOrFail($id); // SELECT * FROM task_comments WHERE id = $id 
 
-        if (!$element) {
-            // 404 Not Found
-            $data = [
-                'status' => 404,
-                'message' => 'TaskComment not found',
-            ];
+            return response()->json($element, 200);
 
-            return response()->json($data, 404);
-        }
+        } catch (\Exception $e) {
 
-        // 200 OK
+            Log::Error('BoardController@show', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'task_comment' => $element,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
     }
 
     /**
@@ -66,6 +69,7 @@ class TaskCommentController extends Controller
      */
     public function store(Request $request)
     {
+        try {
         Log::Debug('TaskCommentController@store');
 
         $validator = Validator::make($request->all(), [
@@ -91,15 +95,26 @@ class TaskCommentController extends Controller
 		$element->from_email = $request->from_email;
 		$element->task_id = $request->task_id;
 
+            $element->save();
 
-        $element->save();
 
         $data = [
             'status' => 200,
-            'task_comment' => $element,
+                'task_comment' => $element
         ];
         Log::Debug('TaskCommentController@store saved in database', $data);
-        return response()->json($data, 200);
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@store', ['message' => $e->getMessage()]);
+            $data = [
+                'status' => 500,
+                'error' => 'Internal Server Error',
+            ];
+
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -107,6 +122,7 @@ class TaskCommentController extends Controller
      */
     public function update(Request $request, int $id)
     {
+        try {
         Log::Debug("TaskCommentController@update $id");
 
         $validator = Validator::make($request->all(), [
@@ -127,17 +143,7 @@ class TaskCommentController extends Controller
             return response()->json($data, 422);
         }
 
-        $element = TaskComment::find($id);
-
-        if (!$element) {
-            $data = [
-                'status' => 404,
-                'message' => 'TaskComment not found',
-            ];
-
-            return response()->json($data, 404);
-        }
-
+            $element = TaskComment::findOrFail($id);
         if ($request->text) {
 			$element->text = $request->text;
 		}
@@ -150,12 +156,18 @@ class TaskCommentController extends Controller
 
         $element->save();
 
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@update', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'task_comment' => $element,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
     }
 
     /**
@@ -163,26 +175,30 @@ class TaskCommentController extends Controller
      */
     public function destroy($id)
     {
+        try {
         Log::Debug("TaskCommentController@delete $id");
 
-        $element = TaskComment::find($id);
+            $element = TaskComment::findOrFail($id);
 
-        if (!$element) {
+            $element->delete();
+
             $data = [
-                'status' => 404,
-                'message' => 'TaskComment not found',
+                'status' => 200,
+                'message' => "TaskComment $id deleted",
             ];
 
-            return response()->json($data, 404);
-        }
+            return response()->json($data, 200);
 
-        $element->delete();
+        } catch (\Exception $e) {
 
+            Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'message' => "TaskComment $id deleted",
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
+
     }
 }

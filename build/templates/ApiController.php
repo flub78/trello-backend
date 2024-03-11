@@ -21,16 +21,23 @@ class {{class}}Controller extends Controller
      */
     public function index()
     {
-        Log::Debug('{{class}}Controller@index');
+        try {
+            Log::Debug('{{class}}Controller@index');
 
-        $elements = {{class}}::all(); // SELECT * FROM {{element}}s
+            $elements = {{class}}::all(); // SELECT * FROM {{element}}s
 
-        $data = [
-            'status' => 200,
-            '{{element}}s' => $elements,
-        ];
+            return response()->json($elements, 200);
+        
+        } catch (\Exception $e) {
 
-        return response()->json($data, 200);
+            Log::Error('BoardController@index', ['message' => $e->getMessage()]);
+            $data = [
+                'status' => 500,
+                'error' => 'Internal Server Error',
+            ];
+
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -38,27 +45,23 @@ class {{class}}Controller extends Controller
      */
     public function show($id)
     {
-        Log::Debug("{{class}}Controller@show $id");
+        try {
+            Log::Debug("{{class}}Controller@show $id");
 
-        $element = {{class}}::find($id); // SELECT * FROM {{element}}s WHERE id = $id
+            $element = {{class}}::findOrFail($id); // SELECT * FROM {{element}}s WHERE id = $id 
 
-        if (!$element) {
-            // 404 Not Found
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@show', ['message' => $e->getMessage()]);
             $data = [
-                'status' => 404,
-                'message' => '{{class}} not found',
+                'status' => 500,
+                'error' => 'Internal Server Error',
             ];
 
-            return response()->json($data, 404);
+            return response()->json($data, 500);
         }
-
-        // 200 OK
-        $data = [
-            'status' => 200,
-            '{{element}}' => $element,
-        ];
-
-        return response()->json($data, 200);
     }
 
     /**
@@ -66,34 +69,46 @@ class {{class}}Controller extends Controller
      */
     public function store(Request $request)
     {
-        Log::Debug('{{class}}Controller@store');
+        try {
+            Log::Debug('{{class}}Controller@store');
 
-        $validator = Validator::make($request->all(), [
-            {{#cg}} create_validation_rules {{/cg}}
-        ]);
+            $validator = Validator::make($request->all(), [
+                {{#cg}} create_validation_rules {{/cg}}
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                $data = [
+                    'status' => 422,
+                    'errors' => $validator->errors(),
+                    'message' => 'Validation failed',
+                ];
+                Log::Debug('{{class}}Controller@store validation failed', $data);
+
+                return response()->json($data, 422);
+            }
+
+            $element = new {{class}};
+            {{#cg}} create_set_attributes {{/cg}}
+            $element->save();
+
+
             $data = [
-                'status' => 422,
-                'errors' => $validator->errors(),
-                'message' => 'Validation failed',
+                'status' => 200,
+                '{{element}}' => $element
+            ];            
+            Log::Debug('{{class}}Controller@store saved in database', $data);
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@store', ['message' => $e->getMessage()]);
+            $data = [
+                'status' => 500,
+                'error' => 'Internal Server Error',
             ];
-            Log::Debug('{{class}}Controller@store validation failed', $data);
 
-            return response()->json($data, 422);
-        }
-
-        $element = new {{class}};
-        {{#cg}} create_set_attributes {{/cg}}
-
-        $element->save();
-
-        $data = [
-            'status' => 200,
-            '{{element}}' => $element,
-        ];
-        Log::Debug('{{class}}Controller@store saved in database', $data);
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -101,43 +116,40 @@ class {{class}}Controller extends Controller
      */
     public function update(Request $request, int $id)
     {
-        Log::Debug("{{class}}Controller@update $id");
+        try {
+            Log::Debug("{{class}}Controller@update $id");
 
-        $validator = Validator::make($request->all(), [
-            {{#cg}} update_validation_rules {{/cg}}
-        ]);
+            $validator = Validator::make($request->all(), [
+                {{#cg}} update_validation_rules {{/cg}}
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                $data = [
+                    'status' => 422,
+                    'errors' => $validator->errors(),
+                    'message' => 'Validation failed',
+                ];
+                Log::Debug('{{class}}Controller@store validation failed', $data);
+
+                return response()->json($data, 422);
+            }
+
+            $element = {{class}}::findOrFail($id);
+            {{#cg}} update_set_attributes {{/cg}}
+            $element->save();
+
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@update', ['message' => $e->getMessage()]);
             $data = [
-                'status' => 422,
-                'errors' => $validator->errors(),
-                'message' => 'Validation failed',
-            ];
-            Log::Debug('{{class}}Controller@store validation failed', $data);
-
-            return response()->json($data, 422);
-        }
-
-        $element = {{class}}::find($id);
-
-        if (!$element) {
-            $data = [
-                'status' => 404,
-                'message' => '{{class}} not found',
+                'status' => 500,
+                'error' => 'Internal Server Error',
             ];
 
-            return response()->json($data, 404);
+            return response()->json($data, 500);
         }
-
-        {{#cg}} update_set_attributes {{/cg}}
-        $element->save();
-
-        $data = [
-            'status' => 200,
-            '{{element}}' => $element,
-        ];
-
-        return response()->json($data, 200);
     }
 
     /**
@@ -145,26 +157,30 @@ class {{class}}Controller extends Controller
      */
     public function destroy($id)
     {
-        Log::Debug("{{class}}Controller@delete $id");
+        try {
+            Log::Debug("{{class}}Controller@delete $id");
 
-        $element = {{class}}::find($id);
+            $element = {{class}}::findOrFail($id);
 
-        if (!$element) {
+            $element->delete();
+
             $data = [
-                'status' => 404,
-                'message' => '{{class}} not found',
+                'status' => 200,
+                'message' => "{{class}} $id deleted",
             ];
 
-            return response()->json($data, 404);
+            return response()->json($data, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
+            $data = [
+                'status' => 500,
+                'error' => 'Internal Server Error',
+            ];
+
+            return response()->json($data, 500);
         }
 
-        $element->delete();
-
-        $data = [
-            'status' => 200,
-            'message' => "{{class}} $id deleted",
-        ];
-
-        return response()->json($data, 200);
     }
 }

@@ -21,16 +21,23 @@ class ChecklistController extends Controller
      */
     public function index()
     {
+        try {
         Log::Debug('ChecklistController@index');
 
         $elements = Checklist::all(); // SELECT * FROM checklists
 
+            return response()->json($elements, 200);
+        
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@index', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'checklists' => $elements,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -38,27 +45,23 @@ class ChecklistController extends Controller
      */
     public function show($id)
     {
+        try {
         Log::Debug("ChecklistController@show $id");
 
-        $element = Checklist::find($id); // SELECT * FROM checklists WHERE id = $id
+            $element = Checklist::findOrFail($id); // SELECT * FROM checklists WHERE id = $id 
 
-        if (!$element) {
-            // 404 Not Found
-            $data = [
-                'status' => 404,
-                'message' => 'Checklist not found',
-            ];
+            return response()->json($element, 200);
 
-            return response()->json($data, 404);
-        }
+        } catch (\Exception $e) {
 
-        // 200 OK
+            Log::Error('BoardController@show', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'checklist' => $element,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
     }
 
     /**
@@ -66,6 +69,7 @@ class ChecklistController extends Controller
      */
     public function store(Request $request)
     {
+        try {
         Log::Debug('ChecklistController@store');
 
         $validator = Validator::make($request->all(), [
@@ -91,15 +95,26 @@ class ChecklistController extends Controller
 		$element->description = $request->description;
 		$element->task_id = $request->task_id;
 
+            $element->save();
 
-        $element->save();
 
         $data = [
             'status' => 200,
-            'checklist' => $element,
+                'checklist' => $element
         ];
         Log::Debug('ChecklistController@store saved in database', $data);
-        return response()->json($data, 200);
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@store', ['message' => $e->getMessage()]);
+            $data = [
+                'status' => 500,
+                'error' => 'Internal Server Error',
+            ];
+
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -107,6 +122,7 @@ class ChecklistController extends Controller
      */
     public function update(Request $request, int $id)
     {
+        try {
         Log::Debug("ChecklistController@update $id");
 
         $validator = Validator::make($request->all(), [
@@ -127,17 +143,7 @@ class ChecklistController extends Controller
             return response()->json($data, 422);
         }
 
-        $element = Checklist::find($id);
-
-        if (!$element) {
-            $data = [
-                'status' => 404,
-                'message' => 'Checklist not found',
-            ];
-
-            return response()->json($data, 404);
-        }
-
+            $element = Checklist::findOrFail($id);
         if ($request->name) {
 			$element->name = $request->name;
 		}
@@ -150,12 +156,18 @@ class ChecklistController extends Controller
 
         $element->save();
 
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@update', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'checklist' => $element,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
     }
 
     /**
@@ -163,26 +175,30 @@ class ChecklistController extends Controller
      */
     public function destroy($id)
     {
+        try {
         Log::Debug("ChecklistController@delete $id");
 
-        $element = Checklist::find($id);
+            $element = Checklist::findOrFail($id);
 
-        if (!$element) {
+            $element->delete();
+
             $data = [
-                'status' => 404,
-                'message' => 'Checklist not found',
+                'status' => 200,
+                'message' => "Checklist $id deleted",
             ];
 
-            return response()->json($data, 404);
-        }
+            return response()->json($data, 200);
 
-        $element->delete();
+        } catch (\Exception $e) {
 
+            Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'message' => "Checklist $id deleted",
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
+
     }
 }

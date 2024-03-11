@@ -21,16 +21,23 @@ class TaskController extends Controller
      */
     public function index()
     {
+        try {
         Log::Debug('TaskController@index');
 
         $elements = Task::all(); // SELECT * FROM tasks
 
+            return response()->json($elements, 200);
+        
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@index', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'tasks' => $elements,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -38,27 +45,23 @@ class TaskController extends Controller
      */
     public function show($id)
     {
+        try {
         Log::Debug("TaskController@show $id");
 
-        $element = Task::find($id); // SELECT * FROM tasks WHERE id = $id
+            $element = Task::findOrFail($id); // SELECT * FROM tasks WHERE id = $id 
 
-        if (!$element) {
-            // 404 Not Found
-            $data = [
-                'status' => 404,
-                'message' => 'Task not found',
-            ];
+            return response()->json($element, 200);
 
-            return response()->json($data, 404);
-        }
+        } catch (\Exception $e) {
 
-        // 200 OK
+            Log::Error('BoardController@show', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'task' => $element,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
     }
 
     /**
@@ -66,6 +69,7 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+        try {
         Log::Debug('TaskController@store');
 
         $validator = Validator::make($request->all(), [
@@ -103,15 +107,26 @@ class TaskController extends Controller
 		$element->favorite = $request->favorite;
 		$element->watched = $request->watched;
 
+            $element->save();
 
-        $element->save();
 
         $data = [
             'status' => 200,
-            'task' => $element,
+                'task' => $element
         ];
         Log::Debug('TaskController@store saved in database', $data);
-        return response()->json($data, 200);
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@store', ['message' => $e->getMessage()]);
+            $data = [
+                'status' => 500,
+                'error' => 'Internal Server Error',
+            ];
+
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -119,6 +134,7 @@ class TaskController extends Controller
      */
     public function update(Request $request, int $id)
     {
+        try {
         Log::Debug("TaskController@update $id");
 
         $validator = Validator::make($request->all(), [
@@ -145,17 +161,7 @@ class TaskController extends Controller
             return response()->json($data, 422);
         }
 
-        $element = Task::find($id);
-
-        if (!$element) {
-            $data = [
-                'status' => 404,
-                'message' => 'Task not found',
-            ];
-
-            return response()->json($data, 404);
-        }
-
+            $element = Task::findOrFail($id);
         if ($request->name) {
 			$element->name = $request->name;
 		}
@@ -186,12 +192,18 @@ class TaskController extends Controller
 
         $element->save();
 
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@update', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'task' => $element,
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
     }
 
     /**
@@ -199,26 +211,30 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
+        try {
         Log::Debug("TaskController@delete $id");
 
-        $element = Task::find($id);
+            $element = Task::findOrFail($id);
 
-        if (!$element) {
+            $element->delete();
+
             $data = [
-                'status' => 404,
-                'message' => 'Task not found',
+                'status' => 200,
+                'message' => "Task $id deleted",
             ];
 
-            return response()->json($data, 404);
-        }
+            return response()->json($data, 200);
 
-        $element->delete();
+        } catch (\Exception $e) {
 
+            Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
         $data = [
-            'status' => 200,
-            'message' => "Task $id deleted",
+                'status' => 500,
+                'error' => 'Internal Server Error',
         ];
 
-        return response()->json($data, 200);
+            return response()->json($data, 500);
+        }
+
     }
 }

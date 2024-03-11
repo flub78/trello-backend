@@ -21,16 +21,23 @@ class ColumnController extends Controller
      */
     public function index()
     {
-        Log::Debug('ColumnController@index');
+        try {
+            Log::Debug('ColumnController@index');
 
-        $elements = Column::all(); // SELECT * FROM columns
+            $elements = Column::all(); // SELECT * FROM columns
 
-        $data = [
-            'status' => 200,
-            'columns' => $elements,
-        ];
+            return response()->json($elements, 200);
+        
+        } catch (\Exception $e) {
 
-        return response()->json($data, 200);
+            Log::Error('BoardController@index', ['message' => $e->getMessage()]);
+            $data = [
+                'status' => 500,
+                'error' => 'Internal Server Error',
+            ];
+
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -38,27 +45,23 @@ class ColumnController extends Controller
      */
     public function show($id)
     {
-        Log::Debug("ColumnController@show $id");
+        try {
+            Log::Debug("ColumnController@show $id");
 
-        $element = Column::find($id); // SELECT * FROM columns WHERE id = $id
+            $element = Column::findOrFail($id); // SELECT * FROM columns WHERE id = $id 
 
-        if (!$element) {
-            // 404 Not Found
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@show', ['message' => $e->getMessage()]);
             $data = [
-                'status' => 404,
-                'message' => 'Column not found',
+                'status' => 500,
+                'error' => 'Internal Server Error',
             ];
 
-            return response()->json($data, 404);
+            return response()->json($data, 500);
         }
-
-        // 200 OK
-        $data = [
-            'status' => 200,
-            'column' => $element,
-        ];
-
-        return response()->json($data, 200);
     }
 
     /**
@@ -66,38 +69,50 @@ class ColumnController extends Controller
      */
     public function store(Request $request)
     {
-        Log::Debug('ColumnController@store');
+        try {
+            Log::Debug('ColumnController@store');
 
-        $validator = Validator::make($request->all(), [
-            "name" => 'required|string|max:128',
+            $validator = Validator::make($request->all(), [
+                "name" => 'required|string|max:128',
 			"board_id" => 'required|exists:boards,id',
 
-        ]);
+            ]);
 
-        if ($validator->fails()) {
-            $data = [
-                'status' => 422,
-                'errors' => $validator->errors(),
-                'message' => 'Validation failed',
-            ];
-            Log::Debug('ColumnController@store validation failed', $data);
+            if ($validator->fails()) {
+                $data = [
+                    'status' => 422,
+                    'errors' => $validator->errors(),
+                    'message' => 'Validation failed',
+                ];
+                Log::Debug('ColumnController@store validation failed', $data);
 
-            return response()->json($data, 422);
-        }
+                return response()->json($data, 422);
+            }
 
-        $element = new Column;
-        $element->name = $request->name;
+            $element = new Column;
+            $element->name = $request->name;
 		$element->board_id = $request->board_id;
 
+            $element->save();
 
-        $element->save();
 
-        $data = [
-            'status' => 200,
-            'column' => $element,
-        ];
-        Log::Debug('ColumnController@store saved in database', $data);
-        return response()->json($data, 200);
+            $data = [
+                'status' => 200,
+                'column' => $element
+            ];            
+            Log::Debug('ColumnController@store saved in database', $data);
+            return response()->json($element, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@store', ['message' => $e->getMessage()]);
+            $data = [
+                'status' => 500,
+                'error' => 'Internal Server Error',
+            ];
+
+            return response()->json($data, 500);
+        }       
     }
 
     /**
@@ -105,51 +120,48 @@ class ColumnController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        Log::Debug("ColumnController@update $id");
+        try {
+            Log::Debug("ColumnController@update $id");
 
-        $validator = Validator::make($request->all(), [
-            "name" => 'string|max:128',
+            $validator = Validator::make($request->all(), [
+                "name" => 'string|max:128',
 			"board_id" => 'exists:boards,id',
 
-        ]);
+            ]);
 
-        if ($validator->fails()) {
-            $data = [
-                'status' => 422,
-                'errors' => $validator->errors(),
-                'message' => 'Validation failed',
-            ];
-            Log::Debug('ColumnController@store validation failed', $data);
+            if ($validator->fails()) {
+                $data = [
+                    'status' => 422,
+                    'errors' => $validator->errors(),
+                    'message' => 'Validation failed',
+                ];
+                Log::Debug('ColumnController@store validation failed', $data);
 
-            return response()->json($data, 422);
-        }
+                return response()->json($data, 422);
+            }
 
-        $element = Column::find($id);
-
-        if (!$element) {
-            $data = [
-                'status' => 404,
-                'message' => 'Column not found',
-            ];
-
-            return response()->json($data, 404);
-        }
-
-        if ($request->name) {
+            $element = Column::findOrFail($id);
+            if ($request->name) {
 			$element->name = $request->name;
 		}
 		if ($request->board_id) {
 			$element->board_id = $request->board_id;
 		}
 
-        $element->save();
+            $element->save();
 
-        $data = [
-            'status' => 200,
-            'column' => $element,
-        ];
+            return response()->json($element, 200);
 
-        return response()->json($data, 200);
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@update', ['message' => $e->getMessage()]);
+            $data = [
+                'status' => 500,
+                'error' => 'Internal Server Error',
+            ];
+
+            return response()->json($data, 500);
+        }
     }
 
     /**
@@ -157,26 +169,30 @@ class ColumnController extends Controller
      */
     public function destroy($id)
     {
-        Log::Debug("ColumnController@delete $id");
+        try {
+            Log::Debug("ColumnController@delete $id");
 
-        $element = Column::find($id);
+            $element = Column::findOrFail($id);
 
-        if (!$element) {
+            $element->delete();
+
             $data = [
-                'status' => 404,
-                'message' => 'Column not found',
+                'status' => 200,
+                'message' => "Column $id deleted",
             ];
 
-            return response()->json($data, 404);
+            return response()->json($data, 200);
+
+        } catch (\Exception $e) {
+
+            Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
+            $data = [
+                'status' => 500,
+                'error' => 'Internal Server Error',
+            ];
+
+            return response()->json($data, 500);
         }
 
-        $element->delete();
-
-        $data = [
-            'status' => 200,
-            'message' => "Column $id deleted",
-        ];
-
-        return response()->json($data, 200);
     }
 }
