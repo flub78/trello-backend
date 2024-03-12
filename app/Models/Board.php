@@ -14,5 +14,5 @@ class Board extends Model
     protected $guarded = [ "read_at", "created_at", "updated_at" ];
 
     protected $primaryKey = 'name';
-
+    protected $keyType = 'string';
 }
