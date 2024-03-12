@@ -11,6 +11,7 @@ class Board extends Model
 
     protected $table = 'boards';
 
-    protected $guarded = [ "id", "read_at", "created_at", "updated_at" ];
+    protected $guarded = [ "read_at", "created_at", "updated_at" ];
 
+    protected $primaryKey = 'name';
 }

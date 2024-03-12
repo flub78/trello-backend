@@ -13,4 +13,5 @@ class {{class}} extends Model
 
     protected $guarded = [ {{#cg}}  guarded {{/cg}} ];
 
+    {{#cg}}  primary_key_declaration {{/cg}}
 }

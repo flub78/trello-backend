@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('boards', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 128);
+            $table->string('name', 128)->primary();
             $table->string('description')->nullable();
             $table->string('email', 128)->unique();
             $table->boolean('favorite')->default(false)
