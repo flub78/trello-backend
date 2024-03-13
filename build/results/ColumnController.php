@@ -48,9 +48,13 @@ class ColumnController extends Controller
         try {
             Log::Debug("ColumnController@show $id");
 
-            $element = Column::findOrFail($id); // SELECT * FROM columns WHERE id = $id 
+            $element = Column::find($id); // SELECT * FROM columns WHERE id = $id 
 
-            return response()->json($element, 200);
+            if ($element) {
+                return response()->json($element, 200);
+            } else {
+                return response()->json(['status' => 404, 'message' => 'Column not found'], 404);
+            }
 
         } catch (\Exception $e) {
 
@@ -143,7 +147,11 @@ class ColumnController extends Controller
                 return response()->json($data, 422);
             }
 
-            $element = Column::findOrFail($id);
+            $element = Column::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => 'Column not found'], 404);
+            }
+
             if ($request->name) {
 				$element->name = $request->name;
 			}
@@ -178,7 +186,10 @@ class ColumnController extends Controller
         try {
             Log::Debug("ColumnController@delete $id");
 
-            $element = Column::findOrFail($id);
+            $element = Column::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => 'Column not found'], 404);
+            }
 
             $element->delete();
 

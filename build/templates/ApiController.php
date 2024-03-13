@@ -48,9 +48,13 @@ class {{class}}Controller extends Controller
         try {
             Log::Debug("{{class}}Controller@show $id");
 
-            $element = {{class}}::findOrFail($id); // SELECT * FROM {{element}}s WHERE id = $id 
+            $element = {{class}}::find($id); // SELECT * FROM {{element}}s WHERE id = $id 
 
-            return response()->json($element, 200);
+            if ($element) {
+                return response()->json($element, 200);
+            } else {
+                return response()->json(['status' => 404, 'message' => "{{class}} $id not found"], 404);
+            }
 
         } catch (\Exception $e) {
 
@@ -114,7 +118,7 @@ class {{class}}Controller extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, $id)
     {
         try {
             Log::Debug("{{class}}Controller@update $id");
@@ -134,7 +138,11 @@ class {{class}}Controller extends Controller
                 return response()->json($data, 422);
             }
 
-            $element = {{class}}::findOrFail($id);
+            $element = {{class}}::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "{{class}} $id not found"], 404);
+            }
+
             {{#cg}} update_set_attributes {{/cg}}
             $element->save();
 
@@ -160,7 +168,10 @@ class {{class}}Controller extends Controller
         try {
             Log::Debug("{{class}}Controller@delete $id");
 
-            $element = {{class}}::findOrFail($id);
+            $element = {{class}}::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "{{class}} $id not found"], 404);
+            }
 
             $element->delete();
 

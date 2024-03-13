@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // http: //127.0.0.1:8000/api/boards
 Route::resource('/boards', App\Http\Controllers\api\BoardController::class);
-Route::put('/boards/{id}/update', [App\Http\Controllers\api\BoardController::class, 'update']);
+//Route::patch('/boards/{id}/update', [App\Http\Controllers\api\BoardController::class, 'update']);
 
 Route::resource('/tasks', App\Http\Controllers\api\TaskController::class);
 Route::resource('/columns', App\Http\Controllers\api\ColumnController::class);

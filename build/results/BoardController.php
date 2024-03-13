@@ -48,9 +48,13 @@ class BoardController extends Controller
         try {
             Log::Debug("BoardController@show $id");
 
-            $element = Board::findOrFail($id); // SELECT * FROM boards WHERE id = $id 
+            $element = Board::find($id); // SELECT * FROM boards WHERE id = $id 
 
-            return response()->json($element, 200);
+            if ($element) {
+                return response()->json($element, 200);
+            } else {
+                return response()->json(['status' => 404, 'message' => "Board $id not found"], 404);
+            }
 
         } catch (\Exception $e) {
 
@@ -158,7 +162,11 @@ class BoardController extends Controller
                 return response()->json($data, 422);
             }
 
-            $element = Board::findOrFail($id);
+            $element = Board::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "Board $id not found"], 404);
+            }
+
             if ($request->name) {
 				$element->name = $request->name;
 			}
@@ -208,7 +216,10 @@ class BoardController extends Controller
         try {
             Log::Debug("BoardController@delete $id");
 
-            $element = Board::findOrFail($id);
+            $element = Board::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "Board $id not found"], 404);
+            }
 
             $element->delete();
 
