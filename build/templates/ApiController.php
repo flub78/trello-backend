@@ -73,7 +73,7 @@ class {{class}}Controller extends Controller
             Log::Debug('{{class}}Controller@store');
 
             $validator = Validator::make($request->all(), [
-                {{#cg}} create_validation_rules {{/cg}}
+                {{#cg}} create_validation_rules 4 {{/cg}}
             ]);
 
             if ($validator->fails()) {

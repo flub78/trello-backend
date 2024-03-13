@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('href')->nullable();
             $table->string('image')->nullable();
             $table->enum('theme', ['light', 'dark'])->default('light')->nullable();
+            $table->string('lists')->nullable()
+                ->comment('{"subtype": "csv_string"}');
 
             $table->timestamps();
         });

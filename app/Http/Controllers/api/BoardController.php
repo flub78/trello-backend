@@ -80,6 +80,7 @@ class BoardController extends Controller
             "href" => 'string|max:255',
             "image" => 'string|max:255',
             "theme" => 'in:light,dark',
+			"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
         ]);
 
@@ -102,6 +103,7 @@ class BoardController extends Controller
         $element->href = $request->href;
         $element->image = $request->image;
         $element->theme = $request->theme;
+		$element->lists = $request->lists;
 
         $element->save();
 
@@ -141,6 +143,8 @@ class BoardController extends Controller
             "href" => 'string|max:255',
             "image" => 'string|max:255',
             "theme" => 'in:light,dark',
+			"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
+
         ]);
         if ($validator->fails()) {
             $data = [
@@ -175,6 +179,9 @@ class BoardController extends Controller
         if ($request->theme) {
             $element->theme = $request->theme;
         }
+		if ($request->lists) {
+			$element->lists = $request->lists;
+		}
 
         $element->save();
 

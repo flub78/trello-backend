@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name', 128)->required();
             $table->string('board_id', 128)->required();
+            $table->string('tasks')->nullable()
+                ->comment('{"subtype": "csv_string"}');
 
             $table->foreign('board_id')->references('name')->on('boards')->onUpdate('cascade')->onDelete('cascade');
 

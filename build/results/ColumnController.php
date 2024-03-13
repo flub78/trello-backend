@@ -74,7 +74,8 @@ class ColumnController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
-			"board_id" => 'required|string|max:128|exists:boards,name',
+				"board_id" => 'required|string|max:128|exists:boards,name',
+				"tasks" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 
@@ -91,7 +92,8 @@ class ColumnController extends Controller
 
             $element = new Column;
             $element->name = $request->name;
-		$element->board_id = $request->board_id;
+			$element->board_id = $request->board_id;
+			$element->tasks = $request->tasks;
 
             $element->save();
 
@@ -125,7 +127,8 @@ class ColumnController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
-			"board_id" => 'string|max:128|exists:boards,name',
+				"board_id" => 'string|max:128|exists:boards,name',
+				"tasks" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 
@@ -142,11 +145,14 @@ class ColumnController extends Controller
 
             $element = Column::findOrFail($id);
             if ($request->name) {
-			$element->name = $request->name;
-		}
-		if ($request->board_id) {
-			$element->board_id = $request->board_id;
-		}
+				$element->name = $request->name;
+			}
+			if ($request->board_id) {
+				$element->board_id = $request->board_id;
+			}
+			if ($request->tasks) {
+				$element->tasks = $request->tasks;
+			}
 
             $element->save();
 
