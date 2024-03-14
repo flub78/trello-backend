@@ -22,19 +22,19 @@ class ChecklistItemController extends Controller
     public function index()
     {
         try {
-        Log::Debug('ChecklistItemController@index');
+            Log::Debug('ChecklistItemController@index');
 
-        $elements = ChecklistItem::all(); // SELECT * FROM checklist_items
+            $elements = ChecklistItem::all(); // SELECT * FROM checklist_items
 
             return response()->json($elements, 200);
         
         } catch (\Exception $e) {
 
             Log::Error('BoardController@index', ['message' => $e->getMessage()]);
-        $data = [
+            $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
-        ];
+            ];
 
             return response()->json($data, 500);
         }       
@@ -46,19 +46,23 @@ class ChecklistItemController extends Controller
     public function show($id)
     {
         try {
-        Log::Debug("ChecklistItemController@show $id");
+            Log::Debug("ChecklistItemController@show $id");
 
-            $element = ChecklistItem::findOrFail($id); // SELECT * FROM checklist_items WHERE id = $id 
+            $element = ChecklistItem::find($id); // SELECT * FROM checklist_items WHERE id = $id 
 
-            return response()->json($element, 200);
+            if ($element) {
+                return response()->json($element, 200);
+            } else {
+                return response()->json(['status' => 404, 'message' => "ChecklistItem $id not found"], 404);
+            }
 
         } catch (\Exception $e) {
 
             Log::Error('BoardController@show', ['message' => $e->getMessage()]);
-        $data = [
+            $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
-        ];
+            ];
 
             return response()->json($data, 500);
         }
@@ -70,39 +74,39 @@ class ChecklistItemController extends Controller
     public function store(Request $request)
     {
         try {
-        Log::Debug('ChecklistItemController@store');
+            Log::Debug('ChecklistItemController@store');
 
-        $validator = Validator::make($request->all(), [
-            "description" => 'required|string|max:128',
-			"done" => 'required|boolean',
-			"checklist_id" => 'required|exists:checklists,id',
+            $validator = Validator::make($request->all(), [
+                "description" => 'required|string|max:128',
+				"done" => 'required|boolean',
+				"checklist_id" => 'required|exists:checklists,id',
 
-        ]);
+            ]);
 
-        if ($validator->fails()) {
-            $data = [
-                'status' => 422,
-                'errors' => $validator->errors(),
-                'message' => 'Validation failed',
-            ];
-            Log::Debug('ChecklistItemController@store validation failed', $data);
+            if ($validator->fails()) {
+                $data = [
+                    'status' => 422,
+                    'errors' => $validator->errors(),
+                    'message' => 'Validation failed',
+                ];
+                Log::Debug('ChecklistItemController@store validation failed', $data);
 
-            return response()->json($data, 422);
-        }
+                return response()->json($data, 422);
+            }
 
-        $element = new ChecklistItem;
-        $element->description = $request->description;
-		$element->done = $request->done;
-		$element->checklist_id = $request->checklist_id;
+            $element = new ChecklistItem;
+            $element->description = $request->description;
+			$element->done = $request->done;
+			$element->checklist_id = $request->checklist_id;
 
             $element->save();
 
 
-        $data = [
-            'status' => 200,
+            $data = [
+                'status' => 200,
                 'checklist_item' => $element
-        ];
-        Log::Debug('ChecklistItemController@store saved in database', $data);
+            ];            
+            Log::Debug('ChecklistItemController@store saved in database', $data);
             return response()->json($element, 200);
 
         } catch (\Exception $e) {
@@ -120,51 +124,55 @@ class ChecklistItemController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, $id)
     {
         try {
-        Log::Debug("ChecklistItemController@update $id");
+            Log::Debug("ChecklistItemController@update $id");
 
-        $validator = Validator::make($request->all(), [
-            "description" => 'string|max:128',
-			"done" => 'boolean',
-			"checklist_id" => 'exists:checklists,id',
+            $validator = Validator::make($request->all(), [
+                "description" => 'string|max:128',
+				"done" => 'boolean',
+				"checklist_id" => 'exists:checklists,id',
 
-        ]);
+            ]);
 
-        if ($validator->fails()) {
-            $data = [
-                'status' => 422,
-                'errors' => $validator->errors(),
-                'message' => 'Validation failed',
-            ];
-            Log::Debug('ChecklistItemController@store validation failed', $data);
+            if ($validator->fails()) {
+                $data = [
+                    'status' => 422,
+                    'errors' => $validator->errors(),
+                    'message' => 'Validation failed',
+                ];
+                Log::Debug('ChecklistItemController@store validation failed', $data);
 
-            return response()->json($data, 422);
-        }
+                return response()->json($data, 422);
+            }
 
-            $element = ChecklistItem::findOrFail($id);
-        if ($request->description) {
-			$element->description = $request->description;
-		}
-		if ($request->done) {
-			$element->done = $request->done;
-		}
-		if ($request->checklist_id) {
-			$element->checklist_id = $request->checklist_id;
-		}
+            $element = ChecklistItem::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "ChecklistItem $id not found"], 404);
+            }
 
-        $element->save();
+            if ($request->description) {
+				$element->description = $request->description;
+			}
+			if ($request->done) {
+				$element->done = $request->done;
+			}
+			if ($request->checklist_id) {
+				$element->checklist_id = $request->checklist_id;
+			}
+
+            $element->save();
 
             return response()->json($element, 200);
 
         } catch (\Exception $e) {
 
             Log::Error('BoardController@update', ['message' => $e->getMessage()]);
-        $data = [
+            $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
-        ];
+            ];
 
             return response()->json($data, 500);
         }
@@ -176,9 +184,12 @@ class ChecklistItemController extends Controller
     public function destroy($id)
     {
         try {
-        Log::Debug("ChecklistItemController@delete $id");
+            Log::Debug("ChecklistItemController@delete $id");
 
-            $element = ChecklistItem::findOrFail($id);
+            $element = ChecklistItem::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "ChecklistItem $id not found"], 404);
+            }
 
             $element->delete();
 
@@ -192,10 +203,10 @@ class ChecklistItemController extends Controller
         } catch (\Exception $e) {
 
             Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
-        $data = [
+            $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
-        ];
+            ];
 
             return response()->json($data, 500);
         }

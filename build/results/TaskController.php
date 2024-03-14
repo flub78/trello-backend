@@ -48,9 +48,13 @@ class TaskController extends Controller
         try {
             Log::Debug("TaskController@show $id");
 
-            $element = Task::findOrFail($id); // SELECT * FROM tasks WHERE id = $id 
+            $element = Task::find($id); // SELECT * FROM tasks WHERE id = $id 
 
-            return response()->json($element, 200);
+            if ($element) {
+                return response()->json($element, 200);
+            } else {
+                return response()->json(['status' => 404, 'message' => "Task $id not found"], 404);
+            }
 
         } catch (\Exception $e) {
 
@@ -74,14 +78,14 @@ class TaskController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
-			"description" => '',
-			"column_id" => 'required|exists:columns,id',
-			"due_date" => 'date',
-			"completed" => 'required|boolean',
-			"image" => 'string|max:255',
-			"href" => 'string|max:255',
-			"favorite" => 'required|boolean',
-			"watched" => 'required|boolean',
+				"description" => '',
+				"column_id" => 'required|exists:columns,id',
+				"due_date" => 'date',
+				"completed" => 'required|boolean',
+				"image" => 'string|max:255',
+				"href" => 'string|max:255',
+				"favorite" => 'required|boolean',
+				"watched" => 'required|boolean',
 
             ]);
 
@@ -98,14 +102,14 @@ class TaskController extends Controller
 
             $element = new Task;
             $element->name = $request->name;
-		$element->description = $request->description;
-		$element->column_id = $request->column_id;
-		$element->due_date = $request->due_date;
-		$element->completed = $request->completed;
-		$element->image = $request->image;
-		$element->href = $request->href;
-		$element->favorite = $request->favorite;
-		$element->watched = $request->watched;
+			$element->description = $request->description;
+			$element->column_id = $request->column_id;
+			$element->due_date = $request->due_date;
+			$element->completed = $request->completed;
+			$element->image = $request->image;
+			$element->href = $request->href;
+			$element->favorite = $request->favorite;
+			$element->watched = $request->watched;
 
             $element->save();
 
@@ -132,21 +136,21 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, $id)
     {
         try {
             Log::Debug("TaskController@update $id");
 
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
-			"description" => '',
-			"column_id" => 'exists:columns,id',
-			"due_date" => 'date',
-			"completed" => 'boolean',
-			"image" => 'string|max:255',
-			"href" => 'string|max:255',
-			"favorite" => 'boolean',
-			"watched" => 'boolean',
+				"description" => '',
+				"column_id" => 'exists:columns,id',
+				"due_date" => 'date',
+				"completed" => 'boolean',
+				"image" => 'string|max:255',
+				"href" => 'string|max:255',
+				"favorite" => 'boolean',
+				"watched" => 'boolean',
 
             ]);
 
@@ -161,34 +165,38 @@ class TaskController extends Controller
                 return response()->json($data, 422);
             }
 
-            $element = Task::findOrFail($id);
+            $element = Task::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "Task $id not found"], 404);
+            }
+
             if ($request->name) {
-			$element->name = $request->name;
-		}
-		if ($request->description) {
-			$element->description = $request->description;
-		}
-		if ($request->column_id) {
-			$element->column_id = $request->column_id;
-		}
-		if ($request->due_date) {
-			$element->due_date = $request->due_date;
-		}
-		if ($request->completed) {
-			$element->completed = $request->completed;
-		}
-		if ($request->image) {
-			$element->image = $request->image;
-		}
-		if ($request->href) {
-			$element->href = $request->href;
-		}
-		if ($request->favorite) {
-			$element->favorite = $request->favorite;
-		}
-		if ($request->watched) {
-			$element->watched = $request->watched;
-		}
+				$element->name = $request->name;
+			}
+			if ($request->description) {
+				$element->description = $request->description;
+			}
+			if ($request->column_id) {
+				$element->column_id = $request->column_id;
+			}
+			if ($request->due_date) {
+				$element->due_date = $request->due_date;
+			}
+			if ($request->completed) {
+				$element->completed = $request->completed;
+			}
+			if ($request->image) {
+				$element->image = $request->image;
+			}
+			if ($request->href) {
+				$element->href = $request->href;
+			}
+			if ($request->favorite) {
+				$element->favorite = $request->favorite;
+			}
+			if ($request->watched) {
+				$element->watched = $request->watched;
+			}
 
             $element->save();
 
@@ -214,7 +222,10 @@ class TaskController extends Controller
         try {
             Log::Debug("TaskController@delete $id");
 
-            $element = Task::findOrFail($id);
+            $element = Task::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "Task $id not found"], 404);
+            }
 
             $element->delete();
 

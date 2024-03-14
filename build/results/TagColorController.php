@@ -48,9 +48,13 @@ class TagColorController extends Controller
         try {
             Log::Debug("TagColorController@show $id");
 
-            $element = TagColor::findOrFail($id); // SELECT * FROM tag_colors WHERE id = $id 
+            $element = TagColor::find($id); // SELECT * FROM tag_colors WHERE id = $id 
 
-            return response()->json($element, 200);
+            if ($element) {
+                return response()->json($element, 200);
+            } else {
+                return response()->json(['status' => 404, 'message' => "TagColor $id not found"], 404);
+            }
 
         } catch (\Exception $e) {
 
@@ -74,7 +78,7 @@ class TagColorController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
-			"color" => 'required|string|max:128',
+				"color" => 'required|string|max:128',
 
             ]);
 
@@ -91,7 +95,7 @@ class TagColorController extends Controller
 
             $element = new TagColor;
             $element->name = $request->name;
-		$element->color = $request->color;
+			$element->color = $request->color;
 
             $element->save();
 
@@ -118,14 +122,14 @@ class TagColorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, $id)
     {
         try {
             Log::Debug("TagColorController@update $id");
 
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
-			"color" => 'string|max:128',
+				"color" => 'string|max:128',
 
             ]);
 
@@ -140,13 +144,17 @@ class TagColorController extends Controller
                 return response()->json($data, 422);
             }
 
-            $element = TagColor::findOrFail($id);
+            $element = TagColor::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "TagColor $id not found"], 404);
+            }
+
             if ($request->name) {
-			$element->name = $request->name;
-		}
-		if ($request->color) {
-			$element->color = $request->color;
-		}
+				$element->name = $request->name;
+			}
+			if ($request->color) {
+				$element->color = $request->color;
+			}
 
             $element->save();
 
@@ -172,7 +180,10 @@ class TagColorController extends Controller
         try {
             Log::Debug("TagColorController@delete $id");
 
-            $element = TagColor::findOrFail($id);
+            $element = TagColor::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "TagColor $id not found"], 404);
+            }
 
             $element->delete();
 

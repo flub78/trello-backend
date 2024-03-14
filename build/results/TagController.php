@@ -48,9 +48,13 @@ class TagController extends Controller
         try {
             Log::Debug("TagController@show $id");
 
-            $element = Tag::findOrFail($id); // SELECT * FROM tags WHERE id = $id 
+            $element = Tag::find($id); // SELECT * FROM tags WHERE id = $id 
 
-            return response()->json($element, 200);
+            if ($element) {
+                return response()->json($element, 200);
+            } else {
+                return response()->json(['status' => 404, 'message' => "Tag $id not found"], 404);
+            }
 
         } catch (\Exception $e) {
 
@@ -74,7 +78,7 @@ class TagController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "task_id" => 'required|exists:tasks,id',
-			"task_color_id" => 'required|exists:tag_colors,id',
+				"task_color_id" => 'required|exists:tag_colors,id',
 
             ]);
 
@@ -91,7 +95,7 @@ class TagController extends Controller
 
             $element = new Tag;
             $element->task_id = $request->task_id;
-		$element->task_color_id = $request->task_color_id;
+			$element->task_color_id = $request->task_color_id;
 
             $element->save();
 
@@ -118,14 +122,14 @@ class TagController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, $id)
     {
         try {
             Log::Debug("TagController@update $id");
 
             $validator = Validator::make($request->all(), [
                 "task_id" => 'exists:tasks,id',
-			"task_color_id" => 'exists:tag_colors,id',
+				"task_color_id" => 'exists:tag_colors,id',
 
             ]);
 
@@ -140,13 +144,17 @@ class TagController extends Controller
                 return response()->json($data, 422);
             }
 
-            $element = Tag::findOrFail($id);
+            $element = Tag::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "Tag $id not found"], 404);
+            }
+
             if ($request->task_id) {
-			$element->task_id = $request->task_id;
-		}
-		if ($request->task_color_id) {
-			$element->task_color_id = $request->task_color_id;
-		}
+				$element->task_id = $request->task_id;
+			}
+			if ($request->task_color_id) {
+				$element->task_color_id = $request->task_color_id;
+			}
 
             $element->save();
 
@@ -172,7 +180,10 @@ class TagController extends Controller
         try {
             Log::Debug("TagController@delete $id");
 
-            $element = Tag::findOrFail($id);
+            $element = Tag::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "Tag $id not found"], 404);
+            }
 
             $element->delete();
 

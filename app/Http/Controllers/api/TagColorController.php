@@ -22,19 +22,19 @@ class TagColorController extends Controller
     public function index()
     {
         try {
-        Log::Debug('TagColorController@index');
+            Log::Debug('TagColorController@index');
 
-        $elements = TagColor::all(); // SELECT * FROM tag_colors
+            $elements = TagColor::all(); // SELECT * FROM tag_colors
 
             return response()->json($elements, 200);
         
         } catch (\Exception $e) {
 
             Log::Error('BoardController@index', ['message' => $e->getMessage()]);
-        $data = [
+            $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
-        ];
+            ];
 
             return response()->json($data, 500);
         }       
@@ -46,19 +46,23 @@ class TagColorController extends Controller
     public function show($id)
     {
         try {
-        Log::Debug("TagColorController@show $id");
+            Log::Debug("TagColorController@show $id");
 
-            $element = TagColor::findOrFail($id); // SELECT * FROM tag_colors WHERE id = $id 
+            $element = TagColor::find($id); // SELECT * FROM tag_colors WHERE id = $id 
 
-            return response()->json($element, 200);
+            if ($element) {
+                return response()->json($element, 200);
+            } else {
+                return response()->json(['status' => 404, 'message' => "TagColor $id not found"], 404);
+            }
 
         } catch (\Exception $e) {
 
             Log::Error('BoardController@show', ['message' => $e->getMessage()]);
-        $data = [
+            $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
-        ];
+            ];
 
             return response()->json($data, 500);
         }
@@ -70,37 +74,37 @@ class TagColorController extends Controller
     public function store(Request $request)
     {
         try {
-        Log::Debug('TagColorController@store');
+            Log::Debug('TagColorController@store');
 
-        $validator = Validator::make($request->all(), [
-            "name" => 'required|string|max:128',
-			"color" => 'required|string|max:128',
+            $validator = Validator::make($request->all(), [
+                "name" => 'required|string|max:128',
+				"color" => 'required|string|max:128',
 
-        ]);
+            ]);
 
-        if ($validator->fails()) {
-            $data = [
-                'status' => 422,
-                'errors' => $validator->errors(),
-                'message' => 'Validation failed',
-            ];
-            Log::Debug('TagColorController@store validation failed', $data);
+            if ($validator->fails()) {
+                $data = [
+                    'status' => 422,
+                    'errors' => $validator->errors(),
+                    'message' => 'Validation failed',
+                ];
+                Log::Debug('TagColorController@store validation failed', $data);
 
-            return response()->json($data, 422);
-        }
+                return response()->json($data, 422);
+            }
 
-        $element = new TagColor;
-        $element->name = $request->name;
-		$element->color = $request->color;
+            $element = new TagColor;
+            $element->name = $request->name;
+			$element->color = $request->color;
 
             $element->save();
 
 
-        $data = [
-            'status' => 200,
+            $data = [
+                'status' => 200,
                 'tag_color' => $element
-        ];
-        Log::Debug('TagColorController@store saved in database', $data);
+            ];            
+            Log::Debug('TagColorController@store saved in database', $data);
             return response()->json($element, 200);
 
         } catch (\Exception $e) {
@@ -118,47 +122,51 @@ class TagColorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, $id)
     {
         try {
-        Log::Debug("TagColorController@update $id");
+            Log::Debug("TagColorController@update $id");
 
-        $validator = Validator::make($request->all(), [
-            "name" => 'string|max:128',
-			"color" => 'string|max:128',
+            $validator = Validator::make($request->all(), [
+                "name" => 'string|max:128',
+				"color" => 'string|max:128',
 
-        ]);
+            ]);
 
-        if ($validator->fails()) {
-            $data = [
-                'status' => 422,
-                'errors' => $validator->errors(),
-                'message' => 'Validation failed',
-            ];
-            Log::Debug('TagColorController@store validation failed', $data);
+            if ($validator->fails()) {
+                $data = [
+                    'status' => 422,
+                    'errors' => $validator->errors(),
+                    'message' => 'Validation failed',
+                ];
+                Log::Debug('TagColorController@store validation failed', $data);
 
-            return response()->json($data, 422);
-        }
+                return response()->json($data, 422);
+            }
 
-            $element = TagColor::findOrFail($id);
-        if ($request->name) {
-			$element->name = $request->name;
-		}
-		if ($request->color) {
-			$element->color = $request->color;
-		}
+            $element = TagColor::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "TagColor $id not found"], 404);
+            }
 
-        $element->save();
+            if ($request->name) {
+				$element->name = $request->name;
+			}
+			if ($request->color) {
+				$element->color = $request->color;
+			}
+
+            $element->save();
 
             return response()->json($element, 200);
 
         } catch (\Exception $e) {
 
             Log::Error('BoardController@update', ['message' => $e->getMessage()]);
-        $data = [
+            $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
-        ];
+            ];
 
             return response()->json($data, 500);
         }
@@ -170,9 +178,12 @@ class TagColorController extends Controller
     public function destroy($id)
     {
         try {
-        Log::Debug("TagColorController@delete $id");
+            Log::Debug("TagColorController@delete $id");
 
-            $element = TagColor::findOrFail($id);
+            $element = TagColor::find($id);
+            if (!$element) {
+                return response()->json(['status' => 404, 'message' => "TagColor $id not found"], 404);
+            }
 
             $element->delete();
 
@@ -186,10 +197,10 @@ class TagColorController extends Controller
         } catch (\Exception $e) {
 
             Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
-        $data = [
+            $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
-        ];
+            ];
 
             return response()->json($data, 500);
         }
