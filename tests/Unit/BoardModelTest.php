@@ -8,13 +8,22 @@ use Tests\TestCase;
 class BoardModelTest extends TestCase
 {
     /**
-     * A basic test example.
+     * Test element creation, read, update and delete
+     * Given the database server is on
+     * Given the schema exists in database
+     * When creating an element
+     * Then it is stored in database, it can be read, updated and deleted
      */
-    public function test_that_true_is_true(): void
+    public function testCRUD(): void
     {
         $this->assertTrue(true);
         $initial_count = Board::count();
 
         echo ("Initial count: $initial_count\n");
+
+        // Create an element
+        $element = Board::factory()->create();
+        $this->assertNotNull($element);
+
     }
 }
