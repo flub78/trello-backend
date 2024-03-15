@@ -24,3 +24,4 @@ Homestead.json
 build/SETENV.BAT
 /build/results/
 *.bak
+.env.testing
