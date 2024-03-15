@@ -19,11 +19,20 @@ class BoardModelTest extends TestCase
         $this->assertTrue(true);
         $initial_count = Board::count();
 
-        echo ("Initial count: $initial_count\n");
-
         // Create an element
-        $element = Board::factory()->create();
-        $this->assertNotNull($element);
+        $elt1 = Board::factory()->create();
+        $this->assertNotNull($elt1);
+        $elt2 = Board::factory()->create();
+        $this->assertNotNull($elt2);
+        $elt3 = Board::factory()->create();
+        $this->assertNotNull($elt3);
+
+        $new_count = Board::count();
+        $this->assertTrue($new_count == $initial_count + 3);
+
+        // Read the element
+        $found = Board::find($elt2->name);
+        var_dump($found);
 
     }
 }
