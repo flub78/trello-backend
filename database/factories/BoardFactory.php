@@ -31,18 +31,14 @@ class BoardFactory extends Factory
         $next = $count + 1;
 
         return [
-            'name' => $this->faker->word,
-            'description' => $this->faker->word,
-            'email' => $this->faker->word,
+            'name' => $this->faker->unique()->name,
+            'description' => $this->faker->sentence(17),
+            'email' => $this->faker->unique()->safeEmail,
             'favorite' => $this->faker->boolean,
-            'read_at' => $this->faker->dateTime(),
-            'href' => $this->faker->word,
-            'image' => $this->faker->word,
+            'href' => $this->faker->sentence(17),
+            'image' => $this->faker->sentence(17),
             'theme' => $this->faker->randomElement(['light', 'dark']),
-            'lists' => $this->faker->csv_string(4),
-            'created_at' => $this->faker->dateTime(),
-            'updated_at' => $this->faker->dateTime(),
-
+            'lists' => $this->faker->csv_string(10),
         ];
     }
 
