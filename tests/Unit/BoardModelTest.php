@@ -5,6 +5,9 @@ namespace Tests\Unit;
 use App\Models\Board;
 use Tests\TestCase;
 
+/**
+ * Test the Board model
+ */
 class BoardModelTest extends TestCase
 {
     /**
@@ -33,23 +36,23 @@ class BoardModelTest extends TestCase
         $this->assertNotNull($elt3, "the element 3 has been created");
         $this->assertTrue($elt3->save(), "the element 3 has been saved in database");
 
+        // Read back the elements
+        $latest = Board::find($elt3_key);
+
         $new_count = Board::count();
         $this->assertTrue($new_count == $initial_count + 3, "3 elements added to the database");
 
-        $latest = Board::latest()->first();
-
-        // for non_unique_fillable_fields
-        // count the differences between elt2 and elt3
-        // and copy $elt2 values to $elt3
+        // for csv_high_variability_fields
+        // fields with low variability cannot be compared as they could be identical between two elements
         $diff = 0;
-        foreach (["description", "favorite", "href", "image", "theme", "lists"] as $key) {
+        foreach (["description", "href", "image", "lists"] as $key) {
             if ($elt2->$key != $latest->$key) {
                 $diff++;
                 $latest->$key = $elt2->$key;
             }
         }
 
-        echo "diff: $diff\n";
+        $this->assertTrue($diff > 0, "at least 1 differences between elt2 and latest");
 
         // Update the element
         if ($diff > 0) {
@@ -59,14 +62,9 @@ class BoardModelTest extends TestCase
             $found = Board::find($elt3_key);
             $this->assertNotNull($found, "and it can be read back from database");
 
-            $diff = 0;
-            foreach (["description", "favorite", "href", "image", "theme", "lists"] as $key) {
-                if ($elt2->$key != $found->$key) {
-                    $diff++;
-                }
+            foreach (["description", "href", "image", "lists"] as $key) {
+                $this->assertEquals($elt2->$key, $found->$key, "$key updated");
             }
-
-            $this->assertTrue($diff == 0, "the updated element is correct");
         }
 
         // Delete the element
@@ -75,6 +73,6 @@ class BoardModelTest extends TestCase
         $this->assertTrue($elt2->delete(), "the element 2 has been deleted from database");
 
         $final_count = Board::count();
-        $this->assertEquals($initial_count, $final_count, "the database has the same number of elements as before");
+        $this->assertEquals($initial_count, $final_count, "\$initial_count:$initial_count == \$final_count: $final_count");
     }
 }
