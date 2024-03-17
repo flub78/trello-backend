@@ -40,8 +40,9 @@ class TagColorModelTest extends TestCase
         $elt3_key = $elt3->id;
         $this->assertNotNull($elt3, "the element 3 has been created");
         $this->assertTrue($elt3->save(), "the element 3 has been saved in database");
-        if ('id' == 'id') $elt3_key = $elt3->id;
-
+        if ('id' == 'id') {
+            $elt3_key = $elt3->id;
+        }
 
         $new_count = TagColor::count();
         $this->assertTrue($new_count == $initial_count + 3, "3 elements added to the database");

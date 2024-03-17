@@ -9,6 +9,8 @@ namespace Tests\Unit;
 
 use App\Models\{{class}};
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
 
 /**
  * Test the {{class}} model
@@ -37,10 +39,10 @@ class {{class}}ModelTest extends TestCase
         $this->assertTrue($elt2->save(), "the element 2 has been saved in database");
 
         $elt3 = {{class}}::factory()->make();
-        $elt3_key = $elt3->{{primary_key}};
+        $elt3_key = $elt3->{{primary_key}};  // if the primary key is provided by the factory
         $this->assertNotNull($elt3, "the element 3 has been created");
         $this->assertTrue($elt3->save(), "the element 3 has been saved in database");
-        if ('{{primary_key}}' == 'id') $elt3_key = $elt3->id;
+        if ('{{primary_key}}' == 'id') $elt3_key = $elt3->id;   // if the primary key is auto incremented
 
 
         $new_count = {{class}}::count();
