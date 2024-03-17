@@ -7,45 +7,40 @@
 
 namespace Database\Factories;
 
-use App\Models\Board;
+use App\Models\board;
+use App\Models\Column;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use Illuminate\Http\UploadedFile;
 
-
-class BoardFactory extends Factory
+class ColumnFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Board::class;
+    protected $model = Column::class;
 
     /**
      * Define the model's default state.
      *
      * @return array
      */
-    public function definition() {
-        $count = Board::count ();
+    public function definition()
+    {
+        $count = Column::count();
         $next = $count + 1;
-        
+
         return [
             'name' => $this->faker->unique()->name,
-		'description' => $this->faker->sentence(17),
-		'email' => $this->faker->unique()->safeEmail,
-		'favorite' => $this->faker->boolean,
-		'href' => $this->faker->sentence(17),
-		'image' => $this->faker->sentence(17),
-		'theme' => $this->faker->randomElement(['light', 'dark']),
-		'lists' => $this->faker->csv_string(10),
+            'board_id' => board::inRandomOrder()->first()->id,
+            'tasks' => $this->faker->csv_string(10),
 
         ];
     }
-    
+
     /**
-     * return a list of erroneous fields and associated expected errors 
+     * return a list of erroneous fields and associated expected errors
      * [
      *      ["fieds" => [],
      *       "errors" => ["name" => "The name field is required."]
@@ -56,10 +51,11 @@ class BoardFactory extends Factory
      * ]
      * @return string[]
      */
-    public function error_cases () {
+    public function error_cases()
+    {
         $scenarios = [];
         // $scenarios[] = ["fields" => [], "errors" => ["name" => "The name field is required."]];
         // $scenarios[] = ["fields" => ["name" => $bad_name], "errors" => ["name" => "The name must not be greater than 255 characters."]];
-       return $scenarios;       
+        return $scenarios;
     }
 }

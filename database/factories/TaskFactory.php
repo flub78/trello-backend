@@ -7,20 +7,21 @@
 
 namespace Database\Factories;
 
-use App\Models\Board;
+use App\Models\Task;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
+use App\Models\columns;
 
 
-class BoardFactory extends Factory
+class TaskFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Board::class;
+    protected $model = Task::class;
 
     /**
      * Define the model's default state.
@@ -28,18 +29,19 @@ class BoardFactory extends Factory
      * @return array
      */
     public function definition() {
-        $count = Board::count ();
+        $count = Task::count ();
         $next = $count + 1;
         
         return [
             'name' => $this->faker->unique()->name,
-		'description' => $this->faker->sentence(17),
-		'email' => $this->faker->unique()->safeEmail,
-		'favorite' => $this->faker->boolean,
-		'href' => $this->faker->sentence(17),
+		'description' => $this->faker->text,
+		'column_id' => columns::inRandomOrder()->first()->id,
+		'due_date' => $this->faker->date(),
+		'completed' => $this->faker->boolean,
 		'image' => $this->faker->sentence(17),
-		'theme' => $this->faker->randomElement(['light', 'dark']),
-		'lists' => $this->faker->csv_string(10),
+		'href' => $this->faker->sentence(17),
+		'favorite' => $this->faker->boolean,
+		'watched' => $this->faker->boolean,
 
         ];
     }

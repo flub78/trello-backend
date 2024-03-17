@@ -37,4 +37,6 @@ Then the database can be migrated
 
     php artisan test
 	php artisan test --testsuite=Unit
+
 	php artisan test --filter=BoardModel
+	php artisan test --filter=TagColorModel
