@@ -7,10 +7,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Checklist;
 use App\Models\ChecklistItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
+use App\Models\Checklist;
+
 
 class ChecklistItemFactory extends Factory
 {
@@ -26,20 +28,20 @@ class ChecklistItemFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
-        $count = ChecklistItem::count();
+    public function definition() {
+        $count = ChecklistItem::count ();
         $next = $count + 1;
-
+        
         return [
             'description' => $this->faker->sentence(8),
-            'done' => $this->faker->boolean,
-            'checklist_id' => Checklist::inRandomOrder()->first()->id,
+			'done' => $this->faker->boolean,
+			'checklist_id' => Checklist::inRandomOrder()->first()->id,
+
         ];
     }
-
+    
     /**
-     * return a list of erroneous fields and associated expected errors
+     * return a list of erroneous fields and associated expected errors 
      * [
      *      ["fieds" => [],
      *       "errors" => ["name" => "The name field is required."]
@@ -50,11 +52,10 @@ class ChecklistItemFactory extends Factory
      * ]
      * @return string[]
      */
-    public function error_cases()
-    {
+    public function error_cases () {
         $scenarios = [];
         // $scenarios[] = ["fields" => [], "errors" => ["name" => "The name field is required."]];
         // $scenarios[] = ["fields" => ["name" => $bad_name], "errors" => ["name" => "The name must not be greater than 255 characters."]];
-        return $scenarios;
+       return $scenarios;       
     }
 }
