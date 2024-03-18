@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Board;
+use App\Models\Checklist;
 use App\Models\Column;
 use App\Models\TagColor;
 use App\Models\Task;
@@ -64,5 +65,11 @@ class DatabaseSeeder extends Seeder
 
         Task::factory()->create(["name" => "task 5", "column_id" => $webapp_c3]);
         Task::factory()->create(["name" => "task 6", "column_id" => $webapp_c3]);
+
+        // Populate checklists
+
+        $task = Task::where('name', 'task 1')->first();
+
+        Checklist::factory()->create(["name" => "steps", "description" => "checklist 1", "task_id" => $task->id]);
     }
 }
