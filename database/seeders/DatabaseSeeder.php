@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Board;
+use App\Models\Column;
 use App\Models\TagColor;
+use App\Models\Task;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -22,16 +24,45 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         // Create some elements
+
+        // Populate Boards
         TagColor::factory(4)->create();
 
-        Board::factory()->create(["name" => "webapp"]);
-        Board::factory()->create(["name" => "gvv"]);
-        Board::factory()->create(["name" => "forest"]);
+        $webapp = Board::factory()->create(["name" => "webapp"]);
+        $gvv = Board::factory()->create(["name" => "gvv"]);
+        $forest = Board::factory()->create(["name" => "forest"]);
 
-        $all_boards = Board::all();
-        echo "Board: " . $all_boards[0]->name . "\n";
-        echo "Board: " . $all_boards[1]->name . "\n";
-        echo "Board: " . $all_boards[2]->name . "\n";
+        // factory-create returns an object but the primary key is not set
 
+        // Populate columns
+        $webapp_c1 = Column::factory()->create(["name" => "todo", "board_id" => "webapp"])->id;
+        $webapp_c2 = Column::factory()->create(["name" => "In progress", "board_id" => "webapp"])->id;
+        $webapp_c3 = Column::factory()->create(["name" => "done", "board_id" => "webapp"])->id;
+
+        $webapp_list = implode(", ", ['"' . $webapp_c1 . '"', '"' . $webapp_c2 . '"', '"' . $webapp_c3 . '"']);
+
+        $webapp = Board::find("webapp");
+        $webapp->lists = $webapp_list;
+        $webapp->save();
+
+        $cl = [];
+        for ($i = 0; $i < 10; $i++) {
+            $cl[] = Column::factory()->create(["name" => "col " . $i, "board_id" => "gvv"])->id;
+        }
+
+        $gvv = Board::find("gvv");
+        $gvv->lists = '"' . implode('", "', $cl) . '"';
+        $gvv->save();
+
+        // populate tasks
+
+        Task::factory()->create(["name" => "task 1", "column_id" => $webapp_c1]);
+        Task::factory()->create(["name" => "task 2", "column_id" => $webapp_c1]);
+        Task::factory()->create(["name" => "task 3", "column_id" => $webapp_c1]);
+
+        Task::factory()->create(["name" => "task 4", "column_id" => $webapp_c2]);
+
+        Task::factory()->create(["name" => "task 5", "column_id" => $webapp_c3]);
+        Task::factory()->create(["name" => "task 6", "column_id" => $webapp_c3]);
     }
 }

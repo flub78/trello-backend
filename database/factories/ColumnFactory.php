@@ -33,7 +33,7 @@ class ColumnFactory extends Factory
 
         return [
             'name' => $this->faker->unique()->name,
-            'board_id' => board::inRandomOrder()->first()->id,
+            'board_id' => board::inRandomOrder()->first()->name,
             'tasks' => $this->faker->csv_string(10),
 
         ];

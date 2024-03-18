@@ -7,12 +7,10 @@
 
 namespace Database\Factories;
 
+use App\Models\column;
 use App\Models\Task;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use Illuminate\Http\UploadedFile;
-use App\Models\columns;
-
 
 class TaskFactory extends Factory
 {
@@ -28,26 +26,27 @@ class TaskFactory extends Factory
      *
      * @return array
      */
-    public function definition() {
-        $count = Task::count ();
+    public function definition()
+    {
+        $count = Task::count();
         $next = $count + 1;
-        
+
         return [
             'name' => $this->faker->unique()->name,
-		'description' => $this->faker->text,
-		'column_id' => columns::inRandomOrder()->first()->id,
-		'due_date' => $this->faker->date(),
-		'completed' => $this->faker->boolean,
-		'image' => $this->faker->sentence(17),
-		'href' => $this->faker->sentence(17),
-		'favorite' => $this->faker->boolean,
-		'watched' => $this->faker->boolean,
+            'description' => $this->faker->text,
+            'column_id' => Column::inRandomOrder()->first()->id,
+            'due_date' => $this->faker->date(),
+            'completed' => $this->faker->boolean,
+            'image' => $this->faker->sentence(17),
+            'href' => $this->faker->sentence(17),
+            'favorite' => $this->faker->boolean,
+            'watched' => $this->faker->boolean,
 
         ];
     }
-    
+
     /**
-     * return a list of erroneous fields and associated expected errors 
+     * return a list of erroneous fields and associated expected errors
      * [
      *      ["fieds" => [],
      *       "errors" => ["name" => "The name field is required."]
@@ -58,10 +57,11 @@ class TaskFactory extends Factory
      * ]
      * @return string[]
      */
-    public function error_cases () {
+    public function error_cases()
+    {
         $scenarios = [];
         // $scenarios[] = ["fields" => [], "errors" => ["name" => "The name field is required."]];
         // $scenarios[] = ["fields" => ["name" => $bad_name], "errors" => ["name" => "The name must not be greater than 255 characters."]];
-       return $scenarios;       
+        return $scenarios;
     }
 }
