@@ -11,7 +11,7 @@ use App\Models\ChecklistItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
-use App\Models\checklists;
+use App\Models\Checklist;
 
 
 class ChecklistItemFactory extends Factory
@@ -34,8 +34,8 @@ class ChecklistItemFactory extends Factory
         
         return [
             'description' => $this->faker->sentence(8),
-		'done' => $this->faker->boolean,
-		'checklist_id' => checklists::inRandomOrder()->first()->id,
+			'done' => $this->faker->boolean,
+			'checklist_id' => Checklist::inRandomOrder()->first()->id,
 
         ];
     }

@@ -11,8 +11,8 @@ use App\Models\Tag;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
-use App\Models\tasks;
-use App\Models\tag_colors;
+use App\Models\Task;
+use App\Models\TagColor;
 
 
 class TagFactory extends Factory
@@ -34,8 +34,8 @@ class TagFactory extends Factory
         $next = $count + 1;
         
         return [
-            'task_id' => tasks::inRandomOrder()->first()->id,
-		'task_color_id' => tag_colors::inRandomOrder()->first()->id,
+            'task_id' => Task::inRandomOrder()->first()->id,
+			'task_color_id' => TagColor::inRandomOrder()->first()->id,
 
         ];
     }

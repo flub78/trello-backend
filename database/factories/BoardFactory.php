@@ -10,6 +10,8 @@ namespace Database\Factories;
 use App\Models\Board;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
+
 
 class BoardFactory extends Factory
 {
@@ -25,25 +27,25 @@ class BoardFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
-        $count = Board::count();
+    public function definition() {
+        $count = Board::count ();
         $next = $count + 1;
-
+        
         return [
             'name' => $this->faker->unique()->word,
-            'description' => $this->faker->sentence(10),
-            'email' => $this->faker->unique()->safeEmail,
-            'favorite' => $this->faker->boolean,
-            'href' => $this->faker->sentence(7),
-            'image' => $this->faker->word(),
-            'theme' => $this->faker->randomElement(['light', 'dark']),
-            'lists' => $this->faker->csv_string(6),
+			'description' => $this->faker->sentence(10},
+			'email' => $this->faker->unique()->safeEmail,
+			'favorite' => $this->faker->boolean,
+			'href' => $this->faker->sentence(7),
+			'image' => $this->faker->word,
+			'theme' => $this->faker->randomElement(['light', 'dark']),
+			'lists' => $this->faker->csv_string(6),
+
         ];
     }
-
+    
     /**
-     * return a list of erroneous fields and associated expected errors
+     * return a list of erroneous fields and associated expected errors 
      * [
      *      ["fieds" => [],
      *       "errors" => ["name" => "The name field is required."]
@@ -54,11 +56,10 @@ class BoardFactory extends Factory
      * ]
      * @return string[]
      */
-    public function error_cases()
-    {
+    public function error_cases () {
         $scenarios = [];
         // $scenarios[] = ["fields" => [], "errors" => ["name" => "The name field is required."]];
         // $scenarios[] = ["fields" => ["name" => $bad_name], "errors" => ["name" => "The name must not be greater than 255 characters."]];
-        return $scenarios;
+       return $scenarios;       
     }
 }

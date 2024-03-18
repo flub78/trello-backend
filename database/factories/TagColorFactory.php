@@ -10,6 +10,8 @@ namespace Database\Factories;
 use App\Models\TagColor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
+
 
 class TagColorFactory extends Factory
 {
@@ -25,20 +27,19 @@ class TagColorFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
-        $count = TagColor::count();
+    public function definition() {
+        $count = TagColor::count ();
         $next = $count + 1;
-
+        
         return [
-            'name' => $this->faker->unique()->safeColorName(),
-            'color' => $this->faker->hexColor(),
+            'name' => $this->faker->safeColorName(),
+			'color' => $this->faker->hexColor(),
 
         ];
     }
-
+    
     /**
-     * return a list of erroneous fields and associated expected errors
+     * return a list of erroneous fields and associated expected errors 
      * [
      *      ["fieds" => [],
      *       "errors" => ["name" => "The name field is required."]
@@ -49,11 +50,10 @@ class TagColorFactory extends Factory
      * ]
      * @return string[]
      */
-    public function error_cases()
-    {
+    public function error_cases () {
         $scenarios = [];
         // $scenarios[] = ["fields" => [], "errors" => ["name" => "The name field is required."]];
         // $scenarios[] = ["fields" => ["name" => $bad_name], "errors" => ["name" => "The name must not be greater than 255 characters."]];
-        return $scenarios;
+       return $scenarios;       
     }
 }

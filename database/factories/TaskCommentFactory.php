@@ -11,7 +11,7 @@ use App\Models\TaskComment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
-use App\Models\tasks;
+use App\Models\Task;
 
 
 class TaskCommentFactory extends Factory
@@ -34,8 +34,8 @@ class TaskCommentFactory extends Factory
         
         return [
             'text' => $this->faker->text,
-		'from_email' => $this->faker->unique()->safeEmail,
-		'task_id' => tasks::inRandomOrder()->first()->id,
+			'from_email' => $this->faker->unique()->safeEmail,
+			'task_id' => Task::inRandomOrder()->first()->id,
 
         ];
     }

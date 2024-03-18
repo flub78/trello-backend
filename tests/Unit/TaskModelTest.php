@@ -8,13 +8,18 @@
 namespace Tests\Unit;
 
 use App\Models\Task;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
 
 /**
  * Test the Task model
  */
 class TaskModelTest extends TestCase
 {
+    protected $log = true;
+
     /**
      * Test element creation, read, update and delete
      * Given the database server is on
@@ -24,37 +29,49 @@ class TaskModelTest extends TestCase
      */
     public function testCRUD(): void
     {
-        $this->assertTrue(true);
         $initial_count = Task::count();
+        if ($this->log) {
+            Log::info("TaskModelTest.testCRUD initial_count: $initial_count");
+        }
 
         // Create some elements
         $elt1 = Task::factory()->make();
+        $elt1_key = $elt1->id;  // if the primary key is provided by the factory
         $this->assertNotNull($elt1, "the element 1 has been created");
         $this->assertTrue($elt1->save(), "the element 1 has been saved in database");
+        if ('id' == 'id')  {$elt1_key = $elt1->id;} // if the primary key is auto incremented
 
         $elt2 = Task::factory()->make();
+        $elt2_key = $elt2->id;  // if the primary key is provided by the factory
         $this->assertNotNull($elt2, "the element 2 has been created");
         $this->assertTrue($elt2->save(), "the element 2 has been saved in database");
+        if ('id' == 'id') $elt2_key = $elt2->id;   // if the primary key is auto incremented
 
         $elt3 = Task::factory()->make();
-        $elt3_key = $elt3->name;
+        $elt3_key = $elt3->id;  // if the primary key is provided by the factory
         $this->assertNotNull($elt3, "the element 3 has been created");
         $this->assertTrue($elt3->save(), "the element 3 has been saved in database");
-
-        // Read back the elements
-        $latest = Task::find($elt3_key);
+        if ('id' == 'id') $elt3_key = $elt3->id;   // if the primary key is auto incremented
 
         $new_count = Task::count();
         $this->assertTrue($new_count == $initial_count + 3, "3 elements added to the database");
+
+        // Read back the elements
+        $relt1 = Task::find($elt1_key);
+        $this->assertNotNull($relt1, "element 1 can be fetched by its key: " . $elt1_key);
+        $relt2 = Task::find($elt2_key);
+        $this->assertNotNull($relt2, "element 2 can be fetched by its key: " . $elt2_key);
+        $relt3 = Task::find($elt3_key);
+        $this->assertNotNull($relt3, "element 3 can be fetched by its key: " . $elt3_key);
 
         // for csv_high_variability_fields
         // fields with low variability cannot be compared as they could be identical between two elements
         $diff = 0;
         $high_variability_fields = ["name", "description", "due_date", "image", "href"];
         foreach ($high_variability_fields as $key) {
-            if ($elt2->$key != $latest->$key) {
+            if ($relt2->$key != $relt3->$key) {
                 $diff++;
-                $latest->$key = $elt2->$key;
+                $relt3->$key = $relt2->$key;
             }
         }
 
@@ -62,23 +79,27 @@ class TaskModelTest extends TestCase
 
         // Update the element
         if ($diff > 0) {
-            $this->assertTrue($latest->save(), "updated element has been saved");
+            $this->assertTrue($relt3->save(), "updated element has been saved");
 
             // Read back the element
             $found = Task::find($elt3_key);
             $this->assertNotNull($found, "and it can be read back from database");
 
             foreach ($high_variability_fields as $key) {
-                $this->assertEquals($elt2->$key, $found->$key, "$key updated");
+                $this->assertEquals($relt2->$key, $found->$key, "$key updated");
             }
         }
 
         // Delete the elements
-        $this->assertTrue($elt3->delete(), "the element 3 has been deleted from database");
-        $this->assertTrue($elt1->delete(), "the element 1 has been deleted from database");
-        $this->assertTrue($elt2->delete(), "the element 2 has been deleted from database");
+        $this->assertTrue($relt3->delete(), "the element 3 has been deleted from database");
+        $this->assertTrue($relt1->delete(), "the element 1 has been deleted from database");
+        $this->assertTrue($relt2->delete(), "the element 2 has been deleted from database");
 
         $final_count = Task::count();
         $this->assertEquals($initial_count, $final_count, "\$initial_count:$initial_count == \$final_count: $final_count");
+        if ($this->log) {
+            Log::info("TaskModelTest.testCRUD final_count: $final_count");
+        }
+
     }
 }

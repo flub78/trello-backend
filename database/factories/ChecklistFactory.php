@@ -11,7 +11,7 @@ use App\Models\Checklist;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
-use App\Models\tasks;
+use App\Models\Task;
 
 
 class ChecklistFactory extends Factory
@@ -33,9 +33,9 @@ class ChecklistFactory extends Factory
         $next = $count + 1;
         
         return [
-            'name' => $this->faker->unique()->name,
-		'description' => $this->faker->sentence(8),
-		'task_id' => tasks::inRandomOrder()->first()->id,
+            'name' => $this->faker->name,
+			'description' => $this->faker->sentence(8),
+			'task_id' => Task::inRandomOrder()->first()->id,
 
         ];
     }
