@@ -18,7 +18,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
  */
 class BoardModelTest extends TestCase
 {
-
     protected $log = true;
 
     /**
@@ -40,7 +39,7 @@ class BoardModelTest extends TestCase
         $elt1_key = $elt1->name;  // if the primary key is provided by the factory
         $this->assertNotNull($elt1, "the element 1 has been created");
         $this->assertTrue($elt1->save(), "the element 1 has been saved in database");
-        if ('name' == 'id')  {$elt1_key = $elt1_key->id;} // if the primary key is auto incremented
+        if ('name' == 'id')  {$elt1_key = $elt1->id;} // if the primary key is auto incremented
 
         $elt2 = Board::factory()->make();
         $elt2_key = $elt2->name;  // if the primary key is provided by the factory
@@ -60,10 +59,8 @@ class BoardModelTest extends TestCase
         // Read back the elements
         $relt1 = Board::find($elt1_key);
         $this->assertNotNull($relt1, "element 1 can be fetched by its key: " . $elt1_key);
-
         $relt2 = Board::find($elt2_key);
         $this->assertNotNull($relt2, "element 2 can be fetched by its key: " . $elt2_key);
-
         $relt3 = Board::find($elt3_key);
         $this->assertNotNull($relt3, "element 3 can be fetched by its key: " . $elt3_key);
 
