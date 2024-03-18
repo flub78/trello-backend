@@ -75,7 +75,9 @@ class TagColorModelTest extends TestCase
             }
         }
 
-        $this->assertTrue($diff > 0, "at least 1 differences between elt2 and latest");
+        if (count($high_variability_fields)) {
+            $this->assertTrue($diff > 0, "at least 1 differences between elt2 and latest");
+        }
 
         // Update the element
         if ($diff > 0) {

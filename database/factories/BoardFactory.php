@@ -33,7 +33,7 @@ class BoardFactory extends Factory
         
         return [
             'name' => $this->faker->unique()->word,
-			'description' => $this->faker->sentence(10},
+			'description' => $this->faker->sentence(10),
 			'email' => $this->faker->unique()->safeEmail,
 			'favorite' => $this->faker->boolean,
 			'href' => $this->faker->sentence(7),
