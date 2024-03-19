@@ -102,11 +102,11 @@ class {{class}}Controller extends Controller
 
 
             $data = [
-                'status' => 200,
+                'status' => 201,
                 '{{element}}' => $element
             ];            
             Log::Debug('{{class}}Controller@store saved in database', $data);
-            return response()->json($element, 200);
+            return response()->json($element, 201);
 
         } catch (\Exception $e) {
 

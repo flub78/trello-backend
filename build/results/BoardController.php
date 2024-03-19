@@ -118,11 +118,11 @@ class BoardController extends Controller
 
 
             $data = [
-                'status' => 200,
+                'status' => 201,
                 'board' => $element
             ];            
             Log::Debug('BoardController@store saved in database', $data);
-            return response()->json($element, 200);
+            return response()->json($element, 201);
 
         } catch (\Exception $e) {
 
