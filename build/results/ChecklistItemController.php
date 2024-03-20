@@ -12,6 +12,7 @@ use App\Models\ChecklistItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 /**
  * Class ChecklistItemController
@@ -24,18 +25,71 @@ class ChecklistItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             Log::Debug('ChecklistItemController@index');
 
-            $elements = ChecklistItem::all(); // SELECT * FROM checklist_items
+            $query = ChecklistItem::query();
 
-            return response()->json($elements, 200);
+            if ($request->has('filter')) {
+                $filters = explode(',', $request->input('filter'));
+
+                foreach ($filters as $filter) {
+                    Log::Debug('ChecklistItemController@index filter' . $filter);
+
+                    list($criteria, $value) = explode(':', $filter, 2);
+
+                    $operator_found = false;
+                    foreach (['<=', '>=', '<', '>', '~='] as $op) {
+                        if (Str::startsWith($value, $op)) {
+                            if ($op == '~=') {
+                                $op = 'LIKE';
+                                $value = substr($value, 2);
+                                $value = '%' . $value . '%';
+
+                            } else {                            
+                                $value = ltrim($value, $op);
+                                $query->where($criteria, $op, $value);
+                            }
+                            $operator_found = true;
+                            break;
+                        }
+                    }
+                    if (!$operator_found) {
+                        $query->where($criteria, $value);
+                    }
+
+                }
+            }
+
+            if ($request->has('sort')) {
+                $sorts = explode(',', $request->input('sort'));
+                Log::Debug('sorting by', $sorts);
+
+                foreach ($sorts as $sortCol) {
+                    $sortDir = Str::startsWith($sortCol, '-') ? 'desc' : 'asc';
+                    $sortCol = ltrim($sortCol, '-');
+
+                    $query->orderBy($sortCol, $sortDir);
+                }
+            }
+
+            if ($request->has('per_page') || $request->has('page')) {
+                // request a specific page
+                $page = $request->page;
+                $per_page = $request->per_page;
+
+                return $query->paginate($per_page);
+
+            } else {
+                $elements = $query->get(); // SELECT * FROM checklist_items
+                return response()->json($elements, 200);
+            }
         
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@index', ['message' => $e->getMessage()]);
+            Log::Error('ChecklistItemController@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
@@ -63,7 +117,7 @@ class ChecklistItemController extends Controller
 
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@show', ['message' => $e->getMessage()]);
+            Log::Error('ChecklistItemController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
@@ -108,15 +162,15 @@ class ChecklistItemController extends Controller
 
 
             $data = [
-                'status' => 200,
+                'status' => 201,
                 'checklist_item' => $element
             ];            
             Log::Debug('ChecklistItemController@store saved in database', $data);
-            return response()->json($element, 200);
+            return response()->json($element, 201);
 
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@store', ['message' => $e->getMessage()]);
+            Log::Error('ChecklistItemController@store', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
@@ -173,7 +227,7 @@ class ChecklistItemController extends Controller
 
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@update', ['message' => $e->getMessage()]);
+            Log::Error('ChecklistItemController@update', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
@@ -207,7 +261,7 @@ class ChecklistItemController extends Controller
 
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
+            Log::Error('ChecklistItemController@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',

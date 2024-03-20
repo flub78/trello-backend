@@ -36,15 +36,22 @@ class TaskController extends Controller
                 $filters = explode(',', $request->input('filter'));
 
                 foreach ($filters as $filter) {
+                    Log::Debug('TaskController@index filter' . $filter);
+
                     list($criteria, $value) = explode(':', $filter, 2);
 
-                    // return $query->where('name_en', 'LIKE', '%' . $keywords . '%');
-
                     $operator_found = false;
-                    foreach (['<=', '>=', '<', '>'] as $op) {
+                    foreach (['<=', '>=', '<', '>', '~='] as $op) {
                         if (Str::startsWith($value, $op)) {
-                            $value = ltrim($value, $op);
-                            $query->where($criteria, $op, $value);
+                            if ($op == '~=') {
+                                $op = 'LIKE';
+                                $value = substr($value, 2);
+                                $value = '%' . $value . '%';
+
+                            } else {                            
+                                $value = ltrim($value, $op);
+                                $query->where($criteria, $op, $value);
+                            }
                             $operator_found = true;
                             break;
                         }

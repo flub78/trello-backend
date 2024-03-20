@@ -12,6 +12,7 @@ use App\Models\Column;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 /**
  * Class ColumnController
@@ -24,18 +25,71 @@ class ColumnController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             Log::Debug('ColumnController@index');
 
-            $elements = Column::all(); // SELECT * FROM columns
+            $query = Column::query();
 
-            return response()->json($elements, 200);
+            if ($request->has('filter')) {
+                $filters = explode(',', $request->input('filter'));
+
+                foreach ($filters as $filter) {
+                    Log::Debug('ColumnController@index filter' . $filter);
+
+                    list($criteria, $value) = explode(':', $filter, 2);
+
+                    $operator_found = false;
+                    foreach (['<=', '>=', '<', '>', '~='] as $op) {
+                        if (Str::startsWith($value, $op)) {
+                            if ($op == '~=') {
+                                $op = 'LIKE';
+                                $value = substr($value, 2);
+                                $value = '%' . $value . '%';
+
+                            } else {                            
+                                $value = ltrim($value, $op);
+                                $query->where($criteria, $op, $value);
+                            }
+                            $operator_found = true;
+                            break;
+                        }
+                    }
+                    if (!$operator_found) {
+                        $query->where($criteria, $value);
+                    }
+
+                }
+            }
+
+            if ($request->has('sort')) {
+                $sorts = explode(',', $request->input('sort'));
+                Log::Debug('sorting by', $sorts);
+
+                foreach ($sorts as $sortCol) {
+                    $sortDir = Str::startsWith($sortCol, '-') ? 'desc' : 'asc';
+                    $sortCol = ltrim($sortCol, '-');
+
+                    $query->orderBy($sortCol, $sortDir);
+                }
+            }
+
+            if ($request->has('per_page') || $request->has('page')) {
+                // request a specific page
+                $page = $request->page;
+                $per_page = $request->per_page;
+
+                return $query->paginate($per_page);
+
+            } else {
+                $elements = $query->get(); // SELECT * FROM columns
+                return response()->json($elements, 200);
+            }
         
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@index', ['message' => $e->getMessage()]);
+            Log::Error('ColumnController@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
@@ -63,7 +117,7 @@ class ColumnController extends Controller
 
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@show', ['message' => $e->getMessage()]);
+            Log::Error('ColumnController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
@@ -108,15 +162,15 @@ class ColumnController extends Controller
 
 
             $data = [
-                'status' => 200,
+                'status' => 201,
                 'column' => $element
             ];            
             Log::Debug('ColumnController@store saved in database', $data);
-            return response()->json($element, 200);
+            return response()->json($element, 201);
 
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@store', ['message' => $e->getMessage()]);
+            Log::Error('ColumnController@store', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
@@ -173,7 +227,7 @@ class ColumnController extends Controller
 
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@update', ['message' => $e->getMessage()]);
+            Log::Error('ColumnController@update', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
@@ -207,7 +261,7 @@ class ColumnController extends Controller
 
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
+            Log::Error('ColumnController@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => 'Internal Server Error',
