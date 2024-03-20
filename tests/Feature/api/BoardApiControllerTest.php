@@ -7,7 +7,7 @@ use App\Models\Board;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
-class BoardControllerTest extends TestCase
+class BoardApiControllerTest extends TestCase
 {
 
     /**
@@ -26,7 +26,6 @@ class BoardControllerTest extends TestCase
         $count = Board::count();
         $this->assertEquals($count, count($json), 'Response count matches database count');
 
-        // var_dump($json);
         $response = $this->get('/api/unknown');
         $response->assertStatus(404);
     }
@@ -45,13 +44,11 @@ class BoardControllerTest extends TestCase
 
         // Create some elements
         $elt1 = Board::factory()->make();
-        // var_dump($elt1->toArray());
         $this->assertNotNull($elt1, "the element 1 has been created");
         $response = $this->post($this->base_url, $elt1->toArray());
         $response->assertStatus(201);
         $json = $response->json();
         $this->assertNotNull($json, "the element 1 has been saved in database");
-        // var_dump($json);
 
         // count the new number of elements
         $elt1_key = $elt1['name'];
@@ -59,6 +56,10 @@ class BoardControllerTest extends TestCase
         $json = $response->json();
         $new_count = count($json);
         $this->assertTrue($new_count == $initial_count + 1, "1 element added to the database");
+        if ('name' == 'id') {
+            $latest = Board::latest()->first();
+            $elt1_key = $latest->id;
+        }
 
         $elt2 = Board::factory()->make();
 
@@ -67,11 +68,11 @@ class BoardControllerTest extends TestCase
         $response->assertStatus(200);
         $json = $response->json();
         $this->assertNotNull($json, "the element 1 can be fetched by its key: " . $elt1_key);
-        //var_dump($json);
 
         // update the created element
         $diff = 0;
         $high_variability_fields = ["description", "href", "image", "lists"];
+
         foreach ($high_variability_fields as $key) {
             if ($elt2->$key != $elt1->$key) {
                 $diff++;
@@ -89,7 +90,6 @@ class BoardControllerTest extends TestCase
             $response->assertStatus(200);
             $json = $response->json();
             $this->assertNotNull($json, "updated element has been saved");
-            // var_dump($json);
 
             // Read back the element
             $response = $this->get($this->base_url . '/' . $elt1_key);
@@ -107,7 +107,6 @@ class BoardControllerTest extends TestCase
         $response->assertStatus(200);
         $json = $response->json();
         $this->assertNotNull($json, "the element 1 has been deleted");
-        var_dump($json);
 
         // count the new number of elements
         $response = $this->get($this->base_url);

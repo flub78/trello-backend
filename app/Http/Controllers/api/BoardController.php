@@ -40,8 +40,6 @@ class BoardController extends Controller
 
                     list($criteria, $value) = explode(':', $filter, 2);
 
-                    // return $query->where('name_en', 'LIKE', '%' . $keywords . '%');
-
                     $operator_found = false;
                     foreach (['<=', '>=', '<', '>', '~='] as $op) {
                         if (Str::startsWith($value, $op)) {
