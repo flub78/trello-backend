@@ -36,13 +36,24 @@ class BoardController extends Controller
                 $filters = explode(',', $request->input('filter'));
 
                 foreach ($filters as $filter) {
+                    Log::Debug('BoardController@index filter' . $filter);
+
                     list($criteria, $value) = explode(':', $filter, 2);
 
                     // return $query->where('name_en', 'LIKE', '%' . $keywords . '%');
 
                     $operator_found = false;
-                    foreach (['<=', '>=', '<', '>'] as $op) {
+                    foreach (['<=', '>=', '<', '>', '~='] as $op) {
                         if (Str::startsWith($value, $op)) {
+                            if ($op == '~=') {
+                                $op = 'LIKE';
+                                $value = substr($value, 2);
+                                $value = '%' . $value . '%';
+
+                            } else {
+                                $value = ltrim($value, $op);
+                                $query->where($criteria, $op, $value);
+                            }
                             $value = ltrim($value, $op);
                             $query->where($criteria, $op, $value);
                             $operator_found = true;
@@ -80,7 +91,7 @@ class BoardController extends Controller
                 $elements = $query->get(); // SELECT * FROM boards
                 return response()->json($elements, 200);
             }
-        
+
         } catch (\Exception $e) {
 
             Log::Error('BoardController@index', ['message' => $e->getMessage()]);
@@ -90,7 +101,7 @@ class BoardController extends Controller
             ];
 
             return response()->json($data, 500);
-        }       
+        }
     }
 
     /**
@@ -101,7 +112,7 @@ class BoardController extends Controller
         try {
             Log::Debug("BoardController@show $id");
 
-            $element = Board::find($id); // SELECT * FROM boards WHERE id = $id 
+            $element = Board::find($id); // SELECT * FROM boards WHERE id = $id
 
             if ($element) {
                 return response()->json($element, 200);
@@ -131,13 +142,13 @@ class BoardController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
-				"description" => 'string|max:255',
-				"email" => 'required|string|max:128|email',
-				"favorite" => 'required|boolean',
-				"href" => 'string|max:255',
-				"image" => 'string|max:255',
-				"theme" => 'in:light,dark',
-				"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
+                "description" => 'string|max:255',
+                "email" => 'required|string|max:128|email',
+                "favorite" => 'required|boolean',
+                "href" => 'string|max:255',
+                "image" => 'string|max:255',
+                "theme" => 'in:light,dark',
+                "lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 
@@ -154,21 +165,20 @@ class BoardController extends Controller
 
             $element = new Board;
             $element->name = $request->name;
-			$element->description = $request->description;
-			$element->email = $request->email;
-			$element->favorite = $request->favorite;
-			$element->href = $request->href;
-			$element->image = $request->image;
-			$element->theme = $request->theme;
-			$element->lists = $request->lists;
+            $element->description = $request->description;
+            $element->email = $request->email;
+            $element->favorite = $request->favorite;
+            $element->href = $request->href;
+            $element->image = $request->image;
+            $element->theme = $request->theme;
+            $element->lists = $request->lists;
 
             $element->save();
 
-
             $data = [
                 'status' => 201,
-                'board' => $element
-            ];            
+                'board' => $element,
+            ];
             Log::Debug('BoardController@store saved in database', $data);
             return response()->json($element, 201);
 
@@ -181,7 +191,7 @@ class BoardController extends Controller
             ];
 
             return response()->json($data, 500);
-        }       
+        }
     }
 
     /**
@@ -194,13 +204,13 @@ class BoardController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
-				"description" => 'string|max:255',
-				"email" => 'string|max:128|email',
-				"favorite" => 'boolean',
-				"href" => 'string|max:255',
-				"image" => 'string|max:255',
-				"theme" => 'in:light,dark',
-				"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
+                "description" => 'string|max:255',
+                "email" => 'string|max:128|email',
+                "favorite" => 'boolean',
+                "href" => 'string|max:255',
+                "image" => 'string|max:255',
+                "theme" => 'in:light,dark',
+                "lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 
@@ -221,29 +231,29 @@ class BoardController extends Controller
             }
 
             if ($request->name) {
-				$element->name = $request->name;
-			}
-			if ($request->description) {
-				$element->description = $request->description;
-			}
-			if ($request->email) {
-				$element->email = $request->email;
-			}
-			if ($request->favorite) {
-				$element->favorite = $request->favorite;
-			}
-			if ($request->href) {
-				$element->href = $request->href;
-			}
-			if ($request->image) {
-				$element->image = $request->image;
-			}
-			if ($request->theme) {
-				$element->theme = $request->theme;
-			}
-			if ($request->lists) {
-				$element->lists = $request->lists;
-			}
+                $element->name = $request->name;
+            }
+            if ($request->description) {
+                $element->description = $request->description;
+            }
+            if ($request->email) {
+                $element->email = $request->email;
+            }
+            if ($request->favorite) {
+                $element->favorite = $request->favorite;
+            }
+            if ($request->href) {
+                $element->href = $request->href;
+            }
+            if ($request->image) {
+                $element->image = $request->image;
+            }
+            if ($request->theme) {
+                $element->theme = $request->theme;
+            }
+            if ($request->lists) {
+                $element->lists = $request->lists;
+            }
 
             $element->save();
 
