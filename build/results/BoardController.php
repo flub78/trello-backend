@@ -12,6 +12,7 @@ use App\Models\Board;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 /**
  * Class BoardController
@@ -24,14 +25,61 @@ class BoardController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             Log::Debug('BoardController@index');
 
-            $elements = Board::all(); // SELECT * FROM boards
+            $query = Board::query();
 
-            return response()->json($elements, 200);
+            if ($request->has('filter')) {
+                $filters = explode(',', $request->input('filter'));
+
+                foreach ($filters as $filter) {
+                    list($criteria, $value) = explode(':', $filter, 2);
+
+                    // return $query->where('name_en', 'LIKE', '%' . $keywords . '%');
+
+                    $operator_found = false;
+                    foreach (['<=', '>=', '<', '>'] as $op) {
+                        if (Str::startsWith($value, $op)) {
+                            $value = ltrim($value, $op);
+                            $query->where($criteria, $op, $value);
+                            $operator_found = true;
+                            break;
+                        }
+                    }
+                    if (!$operator_found) {
+                        $query->where($criteria, $value);
+                    }
+
+                }
+            }
+
+            if ($request->has('sort')) {
+                $sorts = explode(',', $request->input('sort'));
+                Log::Debug('sorting by', $sorts);
+
+                foreach ($sorts as $sortCol) {
+                    $sortDir = Str::startsWith($sortCol, '-') ? 'desc' : 'asc';
+                    $sortCol = ltrim($sortCol, '-');
+                    Log::Debug('order by', $sortCol, $sortDir);
+
+                    $query->orderBy($sortCol, $sortDir);
+                }
+            }
+
+            if ($request->has('per_page') || $request->has('page')) {
+                // request a specific page
+                $page = $request->page;
+                $per_page = $request->per_page;
+
+                return $query->paginate($per_page);
+
+            } else {
+                $elements = $query->get(); // SELECT * FROM boards
+                return response()->json($elements, 200);
+            }
         
         } catch (\Exception $e) {
 
