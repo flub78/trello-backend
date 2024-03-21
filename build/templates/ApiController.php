@@ -50,8 +50,8 @@ class {{class}}Controller extends Controller
 
                             } else {                            
                                 $value = ltrim($value, $op);
-                                $query->where($criteria, $op, $value);
                             }
+                            $query->where($criteria, $op, $value);
                             $operator_found = true;
                             break;
                         }
