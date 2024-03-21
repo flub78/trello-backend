@@ -31,8 +31,9 @@ class {{class}}Controller extends Controller
         try {
             Log::Debug('{{class}}Controller@index');
 
-            if (array_key_exists('QUERY_STRING', $_SERVER)) {
-                $queries = UrlQuery::queries($_SERVER['QUERY_STRING']);
+            $query_string = $request->server('QUERY_STRING');
+            if ($query_string) {
+                $queries = UrlQuery::queries($query_string);
             }
             $query = {{class}}::query();
 
