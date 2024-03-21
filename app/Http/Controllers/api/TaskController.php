@@ -31,9 +31,11 @@ class TaskController extends Controller
         try {
             Log::Debug('TaskController@index');
 
-            if (array_key_exists('QUERY_STRING', $_SERVER)) {
-                $queries = UrlQuery::queries($_SERVER['QUERY_STRING']);
+            $query_string = $request->server('QUERY_STRING');
+            if ($query_string) {
+                $queries = UrlQuery::queries($query_string);
             }
+
             $query = Task::query();
 
             if ($request->has('filter')) {
@@ -52,7 +54,7 @@ class TaskController extends Controller
                                 $value = substr($value, 2);
                                 $value = '%' . $value . '%';
 
-                            } else {                            
+                            } else {
                                 $value = ltrim($value, $op);
                             }
                             $query->where($criteria, $op, $value);
@@ -90,7 +92,7 @@ class TaskController extends Controller
                 $elements = $query->get(); // SELECT * FROM tasks
                 return response()->json($elements, 200);
             }
-        
+
         } catch (\Exception $e) {
 
             Log::Error('TaskController@index', ['message' => $e->getMessage()]);
@@ -100,7 +102,7 @@ class TaskController extends Controller
             ];
 
             return response()->json($data, 500);
-        }       
+        }
     }
 
     /**
@@ -111,7 +113,7 @@ class TaskController extends Controller
         try {
             Log::Debug("TaskController@show $id");
 
-            $element = Task::find($id); // SELECT * FROM tasks WHERE id = $id 
+            $element = Task::find($id); // SELECT * FROM tasks WHERE id = $id
 
             if ($element) {
                 return response()->json($element, 200);
@@ -141,14 +143,14 @@ class TaskController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
-				"description" => '',
-				"column_id" => 'required|exists:columns,id',
-				"due_date" => 'date',
-				"completed" => 'required|boolean',
-				"image" => 'string|max:255',
-				"href" => 'string|max:255',
-				"favorite" => 'required|boolean',
-				"watched" => 'required|boolean',
+                "description" => '',
+                "column_id" => 'required|exists:columns,id',
+                "due_date" => 'date',
+                "completed" => 'required|boolean',
+                "image" => 'string|max:255',
+                "href" => 'string|max:255',
+                "favorite" => 'required|boolean',
+                "watched" => 'required|boolean',
 
             ]);
 
@@ -165,22 +167,21 @@ class TaskController extends Controller
 
             $element = new Task;
             $element->name = $request->name;
-			$element->description = $request->description;
-			$element->column_id = $request->column_id;
-			$element->due_date = $request->due_date;
-			$element->completed = $request->completed;
-			$element->image = $request->image;
-			$element->href = $request->href;
-			$element->favorite = $request->favorite;
-			$element->watched = $request->watched;
+            $element->description = $request->description;
+            $element->column_id = $request->column_id;
+            $element->due_date = $request->due_date;
+            $element->completed = $request->completed;
+            $element->image = $request->image;
+            $element->href = $request->href;
+            $element->favorite = $request->favorite;
+            $element->watched = $request->watched;
 
             $element->save();
 
-
             $data = [
                 'status' => 201,
-                'task' => $element
-            ];            
+                'task' => $element,
+            ];
             Log::Debug('TaskController@store saved in database', $data);
             return response()->json($element, 201);
 
@@ -193,7 +194,7 @@ class TaskController extends Controller
             ];
 
             return response()->json($data, 500);
-        }       
+        }
     }
 
     /**
@@ -206,14 +207,14 @@ class TaskController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
-				"description" => '',
-				"column_id" => 'exists:columns,id',
-				"due_date" => 'date',
-				"completed" => 'boolean',
-				"image" => 'string|max:255',
-				"href" => 'string|max:255',
-				"favorite" => 'boolean',
-				"watched" => 'boolean',
+                "description" => '',
+                "column_id" => 'exists:columns,id',
+                "due_date" => 'date',
+                "completed" => 'boolean',
+                "image" => 'string|max:255',
+                "href" => 'string|max:255',
+                "favorite" => 'boolean',
+                "watched" => 'boolean',
 
             ]);
 
@@ -234,32 +235,32 @@ class TaskController extends Controller
             }
 
             if ($request->name) {
-				$element->name = $request->name;
-			}
-			if ($request->description) {
-				$element->description = $request->description;
-			}
-			if ($request->column_id) {
-				$element->column_id = $request->column_id;
-			}
-			if ($request->due_date) {
-				$element->due_date = $request->due_date;
-			}
-			if ($request->completed) {
-				$element->completed = $request->completed;
-			}
-			if ($request->image) {
-				$element->image = $request->image;
-			}
-			if ($request->href) {
-				$element->href = $request->href;
-			}
-			if ($request->favorite) {
-				$element->favorite = $request->favorite;
-			}
-			if ($request->watched) {
-				$element->watched = $request->watched;
-			}
+                $element->name = $request->name;
+            }
+            if ($request->description) {
+                $element->description = $request->description;
+            }
+            if ($request->column_id) {
+                $element->column_id = $request->column_id;
+            }
+            if ($request->due_date) {
+                $element->due_date = $request->due_date;
+            }
+            if ($request->completed) {
+                $element->completed = $request->completed;
+            }
+            if ($request->image) {
+                $element->image = $request->image;
+            }
+            if ($request->href) {
+                $element->href = $request->href;
+            }
+            if ($request->favorite) {
+                $element->favorite = $request->favorite;
+            }
+            if ($request->watched) {
+                $element->watched = $request->watched;
+            }
 
             $element->save();
 

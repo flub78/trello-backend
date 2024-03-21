@@ -26,7 +26,7 @@ class UrlQuery
             if (preg_match($pattern, $q, $matches)) {
                 $key = $matches[1];
                 $value = $matches[2];
-                # echo 'key: ' . $key . ' value: ' . $value . '<br>';
+                // echo 'key: ' . $key . ' value: ' . $value . '<br>';
                 if (array_key_exists($key, $result)) {
                     $result[$key][] = $value;
                 } else {
