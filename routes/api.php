@@ -24,8 +24,8 @@ Route::resource('/boards', App\Http\Controllers\api\BoardController::class);
 
 Route::resource('/tasks', App\Http\Controllers\api\TaskController::class);
 Route::resource('/columns', App\Http\Controllers\api\ColumnController::class);
-Route::resource('/task-comments', App\Http\Controllers\api\TaskCommentController::class);
+Route::resource('/task_comments', App\Http\Controllers\api\TaskCommentController::class);
 Route::resource('/checklists', App\Http\Controllers\api\ChecklistController::class);
-Route::resource('/checklist-items', App\Http\Controllers\api\ChecklistItemController::class);
-Route::resource('/tag-colors', App\Http\Controllers\api\TagColorController::class);
+Route::resource('/checklist_items', App\Http\Controllers\api\ChecklistItemController::class);
+Route::resource('/tag_colors', App\Http\Controllers\api\TagColorController::class);
 Route::resource('/tags', App\Http\Controllers\api\TagController::class);
