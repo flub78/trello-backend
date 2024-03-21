@@ -7,6 +7,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Helpers\UrlQuery;
 use App\Http\Controllers\Controller;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -30,13 +31,16 @@ class TaskController extends Controller
         try {
             Log::Debug('TaskController@index');
 
+            if (array_key_exists('QUERY_STRING', $_SERVER)) {
+                $queries = UrlQuery::queries($_SERVER['QUERY_STRING']);
+            }
             $query = Task::query();
 
             if ($request->has('filter')) {
-                $filters = explode(',', $request->input('filter'));
+                $filters = $queries['filter'];
 
                 foreach ($filters as $filter) {
-                    Log::Debug('TaskController@index filter' . $filter);
+                    Log::Debug('TaskController@index filter: ' . $filter);
 
                     list($criteria, $value) = explode(':', $filter, 2);
 

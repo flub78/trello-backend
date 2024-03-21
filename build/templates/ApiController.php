@@ -7,6 +7,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Helpers\UrlQuery;
 use App\Http\Controllers\Controller;
 use App\Models\{{class}};
 use Illuminate\Http\Request;
@@ -30,13 +31,16 @@ class {{class}}Controller extends Controller
         try {
             Log::Debug('{{class}}Controller@index');
 
+            if (array_key_exists('QUERY_STRING', $_SERVER)) {
+                $queries = UrlQuery::queries($_SERVER['QUERY_STRING']);
+            }
             $query = {{class}}::query();
 
             if ($request->has('filter')) {
-                $filters = explode(',', $request->input('filter'));
+                $filters = $queries['filter'];
 
                 foreach ($filters as $filter) {
-                    Log::Debug('{{class}}Controller@index filter' . $filter);
+                    Log::Debug('{{class}}Controller@index filter: ' . $filter);
 
                     list($criteria, $value) = explode(':', $filter, 2);
 

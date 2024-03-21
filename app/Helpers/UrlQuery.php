@@ -3,12 +3,18 @@ namespace App\Helpers;
 
 class UrlQuery
 {
-    private $data = null;
-    public function __construct($data)
-    {
-        $this->data = $data;
-    }
 
+    /**
+     * Parse an URL query string and return an associative array
+     * with the keys pointing on arrays of values.
+     *
+     * It is a workaround, I did not find a way to support multiple parameters with Laravel Request
+     *
+     * For example, I want the REST API to support multiple filter conditions for
+     * range selection. The URL query string would look like this:
+     * filter=name:%3Etask%202&filter=name:%3C=Task%205
+     * filter=name:>task 2&filter=name:<=Task 5
+     */
     public static function queries(string $input): array
     {
         $queries = explode('&', $input);
@@ -29,6 +35,5 @@ class UrlQuery
             }
         }
         return $result;
-
     }
 }
