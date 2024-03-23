@@ -9,11 +9,26 @@ namespace Tests\Feature\Api;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\TagColor;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class TagColorApiControllerTest extends TestCase
 {
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->user = User::factory()->create();
+        Sanctum::actingAs($this->user, ['api-access']);
+    }
+
+    public function tearDown(): void
+    {
+        $this->user->delete();
+        parent::tearDown();
+    }
 
     /**
      * A basic test example.

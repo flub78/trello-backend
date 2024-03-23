@@ -73,7 +73,7 @@ class AuthApiControllerTest extends TestCase
         $json = $response->json();
 
         $token = $json["token"];
-        echo "Token: $token\n";
+        # echo "Token: $token\n";
         $this->assertNotNull($token, "Token is null");
 
         // The token can be used to access the API
@@ -142,7 +142,7 @@ class AuthApiControllerTest extends TestCase
         $json = $response->json();
 
         $token = $json["token"];
-        echo "Token: $token\n";
+        # echo "Token: $token\n";
         $this->assertNotNull($token, "Token is null");
 
         // The token can be used to access the API
