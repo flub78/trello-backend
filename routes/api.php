@@ -14,10 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+Route::post('/register', [App\Http\Controllers\api\AuthController::class, 'register']);
+Route::post('/login', [App\Http\Controllers\api\AuthController::class, 'login']);
+Route::post('/logout', [App\Http\Controllers\api\AuthController::class, 'logout'])->middleware('auth:sanctum');
 
+// All the routes protected by sanctum authentication
 Route::middleware('auth:sanctum')->group(function () {
     // http: //127.0.0.1:8000/api/tag_colors
     Route::resource('/tag_colors', App\Http\Controllers\api\TagColorController::class)
@@ -30,6 +31,7 @@ Route::post('/tokens/create', function (Request $request) {
     return ['token' => $token->plainTextToken];
 });
 
+// All the public routes
 // http: //127.0.0.1:8000/api/boards
 Route::resource('/boards', App\Http\Controllers\api\BoardController::class);
 Route::resource('/tasks', App\Http\Controllers\api\TaskController::class);
