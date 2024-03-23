@@ -31,13 +31,13 @@ class AuthController extends Controller
 
             if ($validator->fails()) {
                 $data = [
-                    'status' => 422,
+                    'status' => 400,
                     'errors' => $validator->errors(),
                     'message' => 'Validation failed',
                 ];
                 Log::Debug('Api/Auth@register validation failed', $data);
 
-                return response()->json($data, 422);
+                return response()->json($data, 400);
             }
 
             $user = new User;
@@ -84,13 +84,13 @@ class AuthController extends Controller
 
             if ($validator->fails()) {
                 $data = [
-                    'status' => 422,
+                    'status' => 400,
                     'errors' => $validator->errors(),
                     'message' => 'Login validation failed',
                 ];
                 Log::Debug('Api/Auth@login validation failed', $data);
 
-                return response()->json($data, 422);
+                return response()->json($data, 400);
             }
 
             $user = User::where('email', $request->email)->first();
