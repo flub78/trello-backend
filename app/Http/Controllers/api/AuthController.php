@@ -47,7 +47,7 @@ class AuthController extends Controller
 
             $user->save();
 
-            $token = $user->createToken('trello-api-access')->plainTextToken;
+            $token = $user->createToken('trello-register-' . $request->email)->plainTextToken;
 
             $data = [
                 'status' => 201,
@@ -78,7 +78,6 @@ class AuthController extends Controller
             Log::Debug('Api/Auth@login');
 
             $validator = Validator::make($request->all(), [
-                "name" => 'required|string|max:128',
                 "email" => 'required|string|max:128|email',
                 "password" => 'required|string|max:128',
             ]);
@@ -87,26 +86,34 @@ class AuthController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => 'Login validation failed',
                 ];
                 Log::Debug('Api/Auth@login validation failed', $data);
 
                 return response()->json($data, 422);
             }
 
-            $element = new User;
-            $element->name = $request->name;
-            $element->email = $request->email;
-            $element->password = Hash::make($request->password);
+            $user = User::where('email', $request->email)->first();
 
-            $element->save();
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                $data = [
+                    'status' => 401,
+                    'message' => 'Unauthorized',
+                ];
+                Log::Debug('Api/Auth@login Unauthorized ' . $request->email, $data);
+
+                return response()->json($data, 401);
+            }
+
+            $token = $user->createToken('trello-login-' . $request->email)->plainTextToken;
 
             $data = [
                 'status' => 201,
-                'board' => $element,
+                'board' => $user,
+                'token' => $token,
             ];
-            Log::Debug('Api/Auth@store saved in database', $data);
-            return response()->json($element, 201);
+            Log::Debug('Api/Auth@login ' . $user->email . " succesful login");
+            return response()->json($data, 201);
 
         } catch (\Exception $e) {
 
@@ -126,38 +133,12 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try {
-            Log::Debug('Api/Auth@logout');
+            $name = auth()->user()->name;
+            Log::Debug('Api/Auth@logout ' . $name);
 
-            $validator = Validator::make($request->all(), [
-                "name" => 'required|string|max:128',
-                "email" => 'required|string|max:128|email',
-                "password" => 'required|string|max:128',
-            ]);
+            auth()->user()->tokens()->delete();
 
-            if ($validator->fails()) {
-                $data = [
-                    'status' => 422,
-                    'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
-                ];
-                Log::Debug('Api/Auth@logout validation failed', $data);
-
-                return response()->json($data, 422);
-            }
-
-            $element = new User;
-            $element->name = $request->name;
-            $element->email = $request->email;
-            $element->password = Hash::make($request->password);
-
-            $element->save();
-
-            $data = [
-                'status' => 201,
-                'board' => $element,
-            ];
-            Log::Debug('Api/Auth@store saved in database', $data);
-            return response()->json($element, 201);
+            return response()->json(['message' => $name . ' Logged out'], 200);
 
         } catch (\Exception $e) {
 
