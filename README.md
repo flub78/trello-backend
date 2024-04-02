@@ -4,7 +4,7 @@ Laravel backend for the Trello project
 
 It is a REST API for boards, lists and tasks.
 
-## Execution
+## Starint a development server
 
 in development:
 
@@ -12,7 +12,7 @@ in development:
         Start Apache with PHP 8 support
         Start MySql
 
-    cd lara-trello
+    cd trello-backend
     php artisan serve
 
 The project is available at http://127.0.0.1:8000/
@@ -55,10 +55,13 @@ and migrate the database
 
     php artisan migrate
 
+### composer update
+
 ### Setup the authentication
 
     composer require laravel/breeze --dev
     php artisan breeze:install
+        react
 
 ### To disable registration
 
@@ -206,5 +209,11 @@ it creates the file app/database/migrations/2024_03_02_174125_create_boards_tabl
 ## REST API
 
     http://127.0.0.1:8000/api/boards
+
+## Testing
+
+    php artisan test --filter=Api	
+ 	php artisan test --testsuite=Unit
+	php artisan test --testsuite=Feature   
 
     
