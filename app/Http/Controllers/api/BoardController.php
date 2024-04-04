@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is generated from a template with metadata extracted from the data model.
  * If modifications are required, it is important to consider if they should be done in the template
@@ -19,15 +20,13 @@ use Illuminate\Support\Str;
  * Class BoardController
  * @package App\Http\Controllers\api
  */
-class BoardController extends Controller
-{
+class BoardController extends Controller {
     //
 
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         try {
             Log::Debug('BoardController@index');
 
@@ -52,8 +51,7 @@ class BoardController extends Controller
                                 $op = 'LIKE';
                                 $value = substr($value, 2);
                                 $value = '%' . $value . '%';
-
-                            } else {                            
+                            } else {
                                 $value = ltrim($value, $op);
                             }
                             $query->where($criteria, $op, $value);
@@ -64,7 +62,6 @@ class BoardController extends Controller
                     if (!$operator_found) {
                         $query->where($criteria, $value);
                     }
-
                 }
             }
 
@@ -86,12 +83,10 @@ class BoardController extends Controller
                 $per_page = $request->per_page;
 
                 return $query->paginate($per_page);
-
             } else {
                 $elements = $query->get(); // SELECT * FROM boards
                 return response()->json($elements, 200);
             }
-        
         } catch (\Exception $e) {
 
             Log::Error('BoardController@index', ['message' => $e->getMessage()]);
@@ -101,14 +96,13 @@ class BoardController extends Controller
             ];
 
             return response()->json($data, 500);
-        }       
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id)
-    {
+    public function show($id) {
         try {
             Log::Debug("BoardController@show $id");
 
@@ -119,7 +113,6 @@ class BoardController extends Controller
             } else {
                 return response()->json(['status' => 404, 'message' => "Board $id not found"], 404);
             }
-
         } catch (\Exception $e) {
 
             Log::Error('BoardController@show', ['message' => $e->getMessage()]);
@@ -135,20 +128,19 @@ class BoardController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         try {
             Log::Debug('BoardController@store');
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
-				"description" => 'string|max:255',
-				"email" => 'required|string|max:128|email',
-				"favorite" => 'required|boolean',
-				"href" => 'string|max:255',
-				"image" => 'string|max:255',
-				"theme" => 'in:light,dark',
-				"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
+                "description" => 'string|max:255',
+                "email" => 'required|string|max:128|email',
+                "favorite" => 'required|boolean',
+                "href" => 'string|max:255',
+                "image" => 'string|max:255',
+                "theme" => 'in:light,dark',
+                "lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 
@@ -165,13 +157,13 @@ class BoardController extends Controller
 
             $element = new Board;
             $element->name = $request->name;
-			$element->description = $request->description;
-			$element->email = $request->email;
-			$element->favorite = $request->favorite;
-			$element->href = $request->href;
-			$element->image = $request->image;
-			$element->theme = $request->theme;
-			$element->lists = $request->lists;
+            $element->description = $request->description;
+            $element->email = $request->email;
+            $element->favorite = $request->favorite;
+            $element->href = $request->href;
+            $element->image = $request->image;
+            $element->theme = $request->theme;
+            $element->lists = $request->lists;
 
             $element->save();
 
@@ -179,10 +171,9 @@ class BoardController extends Controller
             $data = [
                 'status' => 201,
                 'board' => $element
-            ];            
+            ];
             Log::Debug('BoardController@store saved in database', $data);
             return response()->json($element, 201);
-
         } catch (\Exception $e) {
 
             Log::Error('BoardController@store', ['message' => $e->getMessage()]);
@@ -192,26 +183,25 @@ class BoardController extends Controller
             ];
 
             return response()->json($data, 500);
-        }       
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         try {
             Log::Debug("BoardController@update $id");
 
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
-				"description" => 'string|max:255',
-				"email" => 'string|max:128|email',
-				"favorite" => 'boolean',
-				"href" => 'string|max:255',
-				"image" => 'string|max:255',
-				"theme" => 'in:light,dark',
-				"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
+                "description" => 'string|max:255',
+                "email" => 'string|max:128|email',
+                "favorite" => 'boolean',
+                "href" => 'string|max:255',
+                "image" => 'string|max:255',
+                "theme" => 'in:light,dark',
+                "lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 
@@ -232,34 +222,33 @@ class BoardController extends Controller
             }
 
             if ($request->name) {
-				$element->name = $request->name;
-			}
-			if ($request->description) {
-				$element->description = $request->description;
-			}
-			if ($request->email) {
-				$element->email = $request->email;
-			}
-			if ($request->favorite) {
-				$element->favorite = $request->favorite;
-			}
-			if ($request->href) {
-				$element->href = $request->href;
-			}
-			if ($request->image) {
-				$element->image = $request->image;
-			}
-			if ($request->theme) {
-				$element->theme = $request->theme;
-			}
-			if ($request->lists) {
-				$element->lists = $request->lists;
-			}
+                $element->name = $request->name;
+            }
+            if ($request->description) {
+                $element->description = $request->description;
+            }
+            if ($request->email) {
+                $element->email = $request->email;
+            }
+            if ($request->favorite) {
+                $element->favorite = $request->favorite;
+            }
+            if ($request->href) {
+                $element->href = $request->href;
+            }
+            if ($request->image) {
+                $element->image = $request->image;
+            }
+            if ($request->theme) {
+                $element->theme = $request->theme;
+            }
+            if ($request->lists) {
+                $element->lists = $request->lists;
+            }
 
             $element->save();
 
             return response()->json($element, 200);
-
         } catch (\Exception $e) {
 
             Log::Error('BoardController@update', ['message' => $e->getMessage()]);
@@ -275,8 +264,7 @@ class BoardController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
+    public function destroy($id) {
         try {
             Log::Debug("BoardController@delete $id");
 
@@ -293,7 +281,6 @@ class BoardController extends Controller
             ];
 
             return response()->json($data, 200);
-
         } catch (\Exception $e) {
 
             Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
@@ -304,6 +291,5 @@ class BoardController extends Controller
 
             return response()->json($data, 500);
         }
-
     }
 }
