@@ -27,9 +27,9 @@ class DatabaseSeeder extends Seeder {
         // Populate Boards
         TagColor::factory(4)->create();
 
-        $webapp = Board::factory()->create(["name" => "webapp", "href" => "board/webapp"]);
-        $gvv = Board::factory()->create(["name" => "gvv", "href" => "board/gvv"]);
-        $forest = Board::factory()->create(["name" => "forest", "href" => "board/forest"]);
+        $webapp = Board::factory()->create(["name" => "webapp", "href" => "board/webapp", "image" => "code_editor.jpg"]);
+        $gvv = Board::factory()->create(["name" => "gvv", "href" => "board/gvv", "image" => "20230903_151040.jpg"]);
+        $forest = Board::factory()->create(["name" => "forest", "href" => "board/forest", "image" => "IMG_20210425_145446.jpg"]);
 
         // factory-create returns an object but the primary key is not set
 
