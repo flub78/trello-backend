@@ -221,28 +221,28 @@ class BoardController extends Controller {
                 return response()->json(['status' => 404, 'message' => "Board $id not found"], 404);
             }
 
-            if ($request->name) {
+            if ($request->exists('name')) {
                 $element->name = $request->name;
             }
-            if ($request->description) {
+            if ($request->exists('description')) {
                 $element->description = $request->description;
             }
-            if ($request->email) {
+            if ($request->exists('email')) {
                 $element->email = $request->email;
             }
-            if ($request->favorite) {
+            if ($request->exists('favorite')) {
                 $element->favorite = $request->favorite;
             }
-            if ($request->href) {
+            if ($request->exists('href')) {
                 $element->href = $request->href;
             }
-            if ($request->image) {
+            if ($request->exists('image')) {
                 $element->image = $request->image;
             }
-            if ($request->theme) {
+            if ($request->exists('theme')) {
                 $element->theme = $request->theme;
             }
-            if ($request->lists) {
+            if ($request->exists('lists')) {
                 $element->lists = $request->lists;
             }
 

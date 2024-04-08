@@ -72,7 +72,6 @@ class NonRegCheckboxTest extends TestCase {
         $response = $this->get($this->base_url . '/' . $elt1_key);
         $response->assertStatus(200);
         $json = $response->json();
-        var_dump($json);
         $this->assertNotNull($json, "and it can be read back from database");
         $this->assertEquals($json["favorite"], True, "updated favorite field is true " . $json["favorite"]);
 
