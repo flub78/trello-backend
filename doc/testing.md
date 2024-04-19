@@ -50,4 +50,5 @@ At some point I will need a same mode to reset the database before every test. A
 
   php artisan test --filter=BoardModel
   php artisan test --filter=TagColorModel
+  php artisan test --filter=BoardAPiController
 ```

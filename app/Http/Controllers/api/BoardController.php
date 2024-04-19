@@ -15,13 +15,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
+
 
 /**
  * Class BoardController
  * @package App\Http\Controllers\api
  */
 class BoardController extends Controller {
+
     //
+
+    protected function set_locale(Request $request) {
+        if ($request->has('lang')) {
+            $locale = $request->input('lang');
+
+            if (in_array($locale, ['en', 'fr'])) {
+                App::setLocale($locale);
+            } else {
+                throw new \Exception('lang = ' . $locale . ' not supported');
+            }
+        }
+    }
 
     /**
      * Display a listing of the resource.
@@ -36,6 +51,10 @@ class BoardController extends Controller {
             }
             $query = Board::query();
 
+            // Manage API language
+            $this->set_locale($request);
+
+            // filtering
             if ($request->has('filter')) {
                 $filters = $queries['filter'];
 
@@ -65,6 +84,7 @@ class BoardController extends Controller {
                 }
             }
 
+            // sorting
             if ($request->has('sort')) {
                 $sorts = explode(',', $request->input('sort'));
                 Log::Debug('sorting by', $sorts);
@@ -77,6 +97,7 @@ class BoardController extends Controller {
                 }
             }
 
+            // pagination
             if ($request->has('per_page') || $request->has('page')) {
                 // request a specific page
                 $page = $request->page;
