@@ -16,6 +16,8 @@ http://127.0.0.1:8000/api/boards?lang=nl
 
     php artisan lang:publish
 
+    FOr some reason the lang directory is generated in public while it should be in resources with Laravel 10.
+
 The default language is stored in config/app.php (en by default)
 
 To set the locale:
@@ -32,6 +34,7 @@ The french translation can be found here https://github.com/s-damian/laravel-lan
 
 The idea is to add a lang parameter to the API and return messages in the correct language.
 
+To use a translated string, just call __('file.key')
 
 ## Table and column names
 

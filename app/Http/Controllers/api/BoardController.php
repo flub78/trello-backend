@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\File;
 
 
 /**
@@ -123,16 +124,25 @@ class BoardController extends Controller {
     /**
      * Display the specified resource.
      */
-    public function show($id) {
+    public function show(Request $request, $id) {
         try {
             Log::Debug("BoardController@show $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $element = Board::find($id); // SELECT * FROM boards WHERE id = $id 
 
             if ($element) {
                 return response()->json($element, 200);
             } else {
-                return response()->json(['status' => 404, 'message' => "Board $id not found"], 404);
+                return response()->json(
+                    [
+                        'status' => 404,
+                        'message' => __('api.not_found', ['elt' => $id])
+                    ],
+                    404
+                );
             }
         } catch (\Exception $e) {
 

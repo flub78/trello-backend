@@ -65,17 +65,9 @@ class APILocalizationTest extends TestCase {
      * As a non regression test, we check that the API can be used with a long parameter
      * and that all messages are translated
      */
-    public function test_localized_api_crud(): void {
+    public function test_localized_crud_api(): void {
 
         foreach (['en', 'fr'] as $lang) {
-            // $this->base_url = '/api/boards?lang=' . $lang;
-            // $response = $this->get($this->base_url);
-            // $response->assertStatus(200);
-            // $json = $response->json();
-            // $this->assertTrue(is_array($json), 'Response is an array');
-            // $count = Board::count();
-            // $this->assertEquals($count, count($json), 'Response count matches database count');
-
 
             // Read the initial state
             $this->base_url = '/api/boards?lang=' . $lang;
