@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\File;
 
 
 /**
@@ -114,7 +113,7 @@ class BoardController extends Controller {
             Log::Error('BoardController@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -149,7 +148,7 @@ class BoardController extends Controller {
             Log::Error('BoardController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -162,6 +161,9 @@ class BoardController extends Controller {
     public function store(Request $request) {
         try {
             Log::Debug('BoardController@store');
+
+            // Manage API language
+            $this->set_locale($request);
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
@@ -179,7 +181,7 @@ class BoardController extends Controller {
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error'),
                 ];
                 Log::Debug('BoardController@store validation failed', $data);
 
@@ -198,7 +200,6 @@ class BoardController extends Controller {
 
             $element->save();
 
-
             $data = [
                 'status' => 201,
                 'board' => $element
@@ -210,7 +211,7 @@ class BoardController extends Controller {
             Log::Error('BoardController@store', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -240,7 +241,7 @@ class BoardController extends Controller {
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error'),
                 ];
                 Log::Debug('BoardController@store validation failed', $data);
 
@@ -249,7 +250,7 @@ class BoardController extends Controller {
 
             $element = Board::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "Board $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
             }
 
             if ($request->exists('name')) {
@@ -285,7 +286,7 @@ class BoardController extends Controller {
             Log::Error('BoardController@update', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -301,14 +302,14 @@ class BoardController extends Controller {
 
             $element = Board::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "Board $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
             }
 
             $element->delete();
 
             $data = [
                 'status' => 200,
-                'message' => "Board $id deleted",
+                'message' => __('api.element_deleted', ['elt' => $id])
             ];
 
             return response()->json($data, 200);
@@ -317,7 +318,7 @@ class BoardController extends Controller {
             Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);

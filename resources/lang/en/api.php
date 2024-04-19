@@ -4,12 +4,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Language Lines
+    | Locale = en
+    | File = api.php
     |--------------------------------------------------------------------------
     |
     |
     */
-    'language' => 'en',
     'not_found' => 'Element: :elt not found',
+    'internal_error' => 'Internal server error',
+    'validation_error' => 'Validation failed',
+    'element_deleted' => 'Element: :elt deleted',
 
 ];
