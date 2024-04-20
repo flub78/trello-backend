@@ -41,3 +41,4 @@ Route::resource('/checklists', App\Http\Controllers\api\ChecklistController::cla
 Route::resource('/checklist_items', App\Http\Controllers\api\ChecklistItemController::class);
 // Route::resource('/tag_colors', App\Http\Controllers\api\TagColorController::class);
 Route::resource('/tags', App\Http\Controllers\api\TagController::class);
+Route::resource('/translations', App\Http\Controllers\api\TranslationController::class);
