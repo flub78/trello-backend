@@ -228,6 +228,9 @@ class BoardController extends Controller {
         try {
             Log::Debug("BoardController@update $id");
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
                 "description" => 'string|max:255',
@@ -299,9 +302,12 @@ class BoardController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id) {
+    public function destroy(Request $request, $id) {
         try {
             Log::Debug("BoardController@delete $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $element = Board::find($id);
             if (!$element) {
