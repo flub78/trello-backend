@@ -28,7 +28,7 @@ class BoardController extends Controller {
 
     protected function set_locale(Request $request) {
         if ($request->has('lang')) {
-            $locale = $request->input('lang');
+            $locale = strtolower($request->input('lang'));
 
             if (in_array($locale, ['en', 'fr'])) {
                 App::setLocale($locale);
