@@ -1,28 +1,24 @@
 <?php
 
 /**
- * This file is generated from a template with metadata extracted from the data model.
- * If modifications are required, it is important to consider if they should be done in the template
- * or in the generated file, in which case caution must be exerted to avoid overwritting.
+ * TranslationController.php
+ * 
+ * String translation API
  */
 
 namespace App\Http\Controllers\api;
 
-use App\Helpers\UrlQuery;
 use App\Http\Controllers\Controller;
-use App\Models\Translation;
+use App\Models\Schema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\App;
-
 
 /**
  * Class TranslationController
  * @package App\Http\Controllers\api
  */
 class TranslationController extends Controller {
-
-    //
 
     protected function set_locale(Request $request) {
         if ($request->has('lang')) {
@@ -37,23 +33,39 @@ class TranslationController extends Controller {
     }
 
     /**
-     * Display a listing of the resource.
+     * Display all translations
      */
     public function index(Request $request) {
         try {
             Log::Debug('TranslationController@index');
 
-            $query_string = $request->server('QUERY_STRING');
-            if ($query_string) {
-                $queries = UrlQuery::queries($query_string);
-            }
-            $query = Translation::query();
-
             // Manage API language
             $this->set_locale($request);
+
+            $data = [
+                'status' => 200,
+                'locale' => App::getLocale(),
+            ];
+
+            $tables = Schema::tableList();
+            $dict = [];
+            foreach ($tables as $table) {
+                $dict[$table] = __($table . '.table');
+                $fields = Schema::fieldList($table);
+
+                $fields_trans = [];
+                foreach ($fields as $field) {
+                    $fields_trans[$field] = __($table . '.' . $field);
+                }
+                $data['fields'][$table] = $fields_trans;
+            }
+            $data['tables'] = $dict;
+
+
+            return response()->json($data, 200);
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@index', ['message' => $e->getMessage()]);
+            Log::Error('TranslationController@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => __('api.internal_error'),
@@ -64,7 +76,7 @@ class TranslationController extends Controller {
     }
 
     /**
-     * Display the specified resource.
+     * Display the translations for a table
      */
     public function show(Request $request, $id) {
         try {
@@ -73,22 +85,27 @@ class TranslationController extends Controller {
             // Manage API language
             $this->set_locale($request);
 
-            $element = Board::find($id); // SELECT * FROM boards WHERE id = $id 
+            $data = [
+                'status' => 200,
+                'locale' => App::getLocale(),
+            ];
 
-            if ($element) {
-                return response()->json($element, 200);
-            } else {
-                return response()->json(
-                    [
-                        'status' => 404,
-                        'message' => __('api.not_found', ['elt' => $id])
-                    ],
-                    404
-                );
+            $table = $id;
+            $fields = Schema::fieldList($table);
+
+            $fields_trans = [];
+            foreach ($fields as $field) {
+                $fields_trans[$field] = __($table . '.' . $field);
             }
+            $data['fields'] = $fields_trans;
+
+            $data['table'] = __($table . '.table');
+            $data['element'] = __($table . '.element');
+
+            return response()->json($data, 200);
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@show', ['message' => $e->getMessage()]);
+            Log::Error('TranslationController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
                 'error' => __('api.internal_error'),
