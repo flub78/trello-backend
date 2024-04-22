@@ -14,20 +14,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class ChecklistItemController
  * @package App\Http\Controllers\api
  */
-class ChecklistItemController extends Controller
-{
+class ChecklistItemController extends Controller {
     //
+    protected function set_locale(Request $request) {
+        if ($request->has('lang')) {
+            $locale = strtolower($request->input('lang'));
+            if ($locale == 'gb') {
+                $locale = 'en';
+            }
 
+            if (in_array($locale, ['en', 'fr'])) {
+                App::setLocale($locale);
+            } else {
+                throw new \Exception('lang = ' . $locale . ' not supported');
+            }
+        }
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
+        
         try {
             Log::Debug('ChecklistItemController@index');
 
@@ -37,6 +50,10 @@ class ChecklistItemController extends Controller
             }
             $query = ChecklistItem::query();
 
+            // Manage API language
+            $this->set_locale($request);
+
+            // filtering
             if ($request->has('filter')) {
                 $filters = $queries['filter'];
 
@@ -68,6 +85,7 @@ class ChecklistItemController extends Controller
                 }
             }
 
+            // sorting
             if ($request->has('sort')) {
                 $sorts = explode(',', $request->input('sort'));
                 Log::Debug('sorting by', $sorts);
@@ -80,6 +98,7 @@ class ChecklistItemController extends Controller
                 }
             }
 
+            // pagination
             if ($request->has('per_page') || $request->has('page')) {
                 // request a specific page
                 $page = $request->page;
@@ -97,7 +116,7 @@ class ChecklistItemController extends Controller
             Log::Error('ChecklistItemController@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -107,17 +126,24 @@ class ChecklistItemController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try {
             Log::Debug("ChecklistItemController@show $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $element = ChecklistItem::find($id); // SELECT * FROM checklist_items WHERE id = $id 
 
             if ($element) {
                 return response()->json($element, 200);
             } else {
-                return response()->json(['status' => 404, 'message' => "ChecklistItem $id not found"], 404);
+                return response()->json(
+                    [
+                        'status' => 404,
+                        'message' => __('api.not_found', ['elt' => $id])
+                    ], 404);
             }
 
         } catch (\Exception $e) {
@@ -125,7 +151,7 @@ class ChecklistItemController extends Controller
             Log::Error('ChecklistItemController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -140,9 +166,12 @@ class ChecklistItemController extends Controller
         try {
             Log::Debug('ChecklistItemController@store');
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 "description" => 'required|string|max:128',
-				"done" => 'required|boolean',
+				"done" => 'required',
 				"checklist_id" => 'required|exists:checklists,id',
 
             ]);
@@ -151,7 +180,7 @@ class ChecklistItemController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('ChecklistItemController@store validation failed', $data);
 
@@ -178,7 +207,7 @@ class ChecklistItemController extends Controller
             Log::Error('ChecklistItemController@store', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -193,9 +222,12 @@ class ChecklistItemController extends Controller
         try {
             Log::Debug("ChecklistItemController@update $id");
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 "description" => 'string|max:128',
-				"done" => 'boolean',
+				"done" => '',
 				"checklist_id" => 'exists:checklists,id',
 
             ]);
@@ -204,7 +236,7 @@ class ChecklistItemController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('ChecklistItemController@store validation failed', $data);
 
@@ -213,16 +245,16 @@ class ChecklistItemController extends Controller
 
             $element = ChecklistItem::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "ChecklistItem $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);                
             }
 
-            if ($request->description) {
+            if ($request->exists('description')) {
 				$element->description = $request->description;
 			}
-			if ($request->done) {
+			if ($request->exists('done')) {
 				$element->done = $request->done;
 			}
-			if ($request->checklist_id) {
+			if ($request->exists('checklist_id')) {
 				$element->checklist_id = $request->checklist_id;
 			}
 
@@ -235,7 +267,7 @@ class ChecklistItemController extends Controller
             Log::Error('ChecklistItemController@update', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -245,21 +277,25 @@ class ChecklistItemController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             Log::Debug("ChecklistItemController@delete $id");
 
+            // Manage API language
+            $this->set_locale($request);
+            
             $element = ChecklistItem::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "ChecklistItem $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
+
             }
 
             $element->delete();
 
             $data = [
                 'status' => 200,
-                'message' => "ChecklistItem $id deleted",
+                'message' => __('api.element_deleted', ['elt' => $id])
             ];
 
             return response()->json($data, 200);
@@ -269,7 +305,7 @@ class ChecklistItemController extends Controller
             Log::Error('ChecklistItemController@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);

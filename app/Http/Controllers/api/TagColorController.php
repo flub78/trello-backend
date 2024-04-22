@@ -14,20 +14,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class TagColorController
  * @package App\Http\Controllers\api
  */
-class TagColorController extends Controller
-{
+class TagColorController extends Controller {
     //
+    protected function set_locale(Request $request) {
+        if ($request->has('lang')) {
+            $locale = strtolower($request->input('lang'));
+            if ($locale == 'gb') {
+                $locale = 'en';
+            }
 
+            if (in_array($locale, ['en', 'fr'])) {
+                App::setLocale($locale);
+            } else {
+                throw new \Exception('lang = ' . $locale . ' not supported');
+            }
+        }
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
+        
         try {
             Log::Debug('TagColorController@index');
 
@@ -37,6 +50,10 @@ class TagColorController extends Controller
             }
             $query = TagColor::query();
 
+            // Manage API language
+            $this->set_locale($request);
+
+            // filtering
             if ($request->has('filter')) {
                 $filters = $queries['filter'];
 
@@ -68,6 +85,7 @@ class TagColorController extends Controller
                 }
             }
 
+            // sorting
             if ($request->has('sort')) {
                 $sorts = explode(',', $request->input('sort'));
                 Log::Debug('sorting by', $sorts);
@@ -80,6 +98,7 @@ class TagColorController extends Controller
                 }
             }
 
+            // pagination
             if ($request->has('per_page') || $request->has('page')) {
                 // request a specific page
                 $page = $request->page;
@@ -97,7 +116,7 @@ class TagColorController extends Controller
             Log::Error('TagColorController@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -107,17 +126,24 @@ class TagColorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try {
             Log::Debug("TagColorController@show $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $element = TagColor::find($id); // SELECT * FROM tag_colors WHERE id = $id 
 
             if ($element) {
                 return response()->json($element, 200);
             } else {
-                return response()->json(['status' => 404, 'message' => "TagColor $id not found"], 404);
+                return response()->json(
+                    [
+                        'status' => 404,
+                        'message' => __('api.not_found', ['elt' => $id])
+                    ], 404);
             }
 
         } catch (\Exception $e) {
@@ -125,7 +151,7 @@ class TagColorController extends Controller
             Log::Error('TagColorController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -140,6 +166,9 @@ class TagColorController extends Controller
         try {
             Log::Debug('TagColorController@store');
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
 				"color" => 'required|string|max:128',
@@ -150,7 +179,7 @@ class TagColorController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('TagColorController@store validation failed', $data);
 
@@ -176,7 +205,7 @@ class TagColorController extends Controller
             Log::Error('TagColorController@store', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -191,6 +220,9 @@ class TagColorController extends Controller
         try {
             Log::Debug("TagColorController@update $id");
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
 				"color" => 'string|max:128',
@@ -201,7 +233,7 @@ class TagColorController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('TagColorController@store validation failed', $data);
 
@@ -210,13 +242,13 @@ class TagColorController extends Controller
 
             $element = TagColor::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "TagColor $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);                
             }
 
-            if ($request->name) {
+            if ($request->exists('name')) {
 				$element->name = $request->name;
 			}
-			if ($request->color) {
+			if ($request->exists('color')) {
 				$element->color = $request->color;
 			}
 
@@ -229,7 +261,7 @@ class TagColorController extends Controller
             Log::Error('TagColorController@update', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -239,21 +271,25 @@ class TagColorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             Log::Debug("TagColorController@delete $id");
 
+            // Manage API language
+            $this->set_locale($request);
+            
             $element = TagColor::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "TagColor $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
+
             }
 
             $element->delete();
 
             $data = [
                 'status' => 200,
-                'message' => "TagColor $id deleted",
+                'message' => __('api.element_deleted', ['elt' => $id])
             ];
 
             return response()->json($data, 200);
@@ -263,7 +299,7 @@ class TagColorController extends Controller
             Log::Error('TagColorController@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);

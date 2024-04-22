@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is generated from a template with metadata extracted from the data model.
  * If modifications are required, it is important to consider if they should be done in the template
@@ -17,15 +16,12 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
 
-
 /**
  * Class BoardController
  * @package App\Http\Controllers\api
  */
 class BoardController extends Controller {
-
     //
-
     protected function set_locale(Request $request) {
         if ($request->has('lang')) {
             $locale = strtolower($request->input('lang'));
@@ -40,11 +36,11 @@ class BoardController extends Controller {
             }
         }
     }
-
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request) {
+        
         try {
             Log::Debug('BoardController@index');
 
@@ -73,7 +69,8 @@ class BoardController extends Controller {
                                 $op = 'LIKE';
                                 $value = substr($value, 2);
                                 $value = '%' . $value . '%';
-                            } else {
+
+                            } else {                            
                                 $value = ltrim($value, $op);
                             }
                             $query->where($criteria, $op, $value);
@@ -84,6 +81,7 @@ class BoardController extends Controller {
                     if (!$operator_found) {
                         $query->where($criteria, $value);
                     }
+
                 }
             }
 
@@ -107,10 +105,12 @@ class BoardController extends Controller {
                 $per_page = $request->per_page;
 
                 return $query->paginate($per_page);
+
             } else {
                 $elements = $query->get(); // SELECT * FROM boards
                 return response()->json($elements, 200);
             }
+        
         } catch (\Exception $e) {
 
             Log::Error('BoardController@index', ['message' => $e->getMessage()]);
@@ -120,7 +120,7 @@ class BoardController extends Controller {
             ];
 
             return response()->json($data, 500);
-        }
+        }       
     }
 
     /**
@@ -145,6 +145,7 @@ class BoardController extends Controller {
                         'message' => __('api.not_found', ['elt' => $id])
                     ], 404);
             }
+
         } catch (\Exception $e) {
 
             Log::Error('BoardController@show', ['message' => $e->getMessage()]);
@@ -170,13 +171,13 @@ class BoardController extends Controller {
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
-                "description" => 'string|max:255',
-                "email" => 'required|string|max:128|email',
-                "favorite" => 'required|boolean',
-                "href" => 'string|max:255',
-                "image" => 'string|max:255',
-                "theme" => 'in:light,dark',
-                "lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
+				"description" => 'string|max:255',
+				"email" => 'required|string|max:128|email',
+				"favorite" => 'required|boolean',
+				"href" => 'string|max:255',
+				"image" => 'string|max:255',
+				"theme" => 'in:light,dark',
+				"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 
@@ -193,22 +194,24 @@ class BoardController extends Controller {
 
             $element = new Board;
             $element->name = $request->name;
-            $element->description = $request->description;
-            $element->email = $request->email;
-            $element->favorite = $request->favorite;
-            $element->href = $request->href;
-            $element->image = $request->image;
-            $element->theme = $request->theme;
-            $element->lists = $request->lists;
+			$element->description = $request->description;
+			$element->email = $request->email;
+			$element->favorite = $request->favorite;
+			$element->href = $request->href;
+			$element->image = $request->image;
+			$element->theme = $request->theme;
+			$element->lists = $request->lists;
 
             $element->save();
+
 
             $data = [
                 'status' => 201,
                 'board' => $element
-            ];
+            ];            
             Log::Debug('BoardController@store saved in database', $data);
             return response()->json($element, 201);
+
         } catch (\Exception $e) {
 
             Log::Error('BoardController@store', ['message' => $e->getMessage()]);
@@ -218,7 +221,7 @@ class BoardController extends Controller {
             ];
 
             return response()->json($data, 500);
-        }
+        }       
     }
 
     /**
@@ -234,13 +237,13 @@ class BoardController extends Controller {
 
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
-                "description" => 'string|max:255',
-                "email" => 'string|max:128|email',
-                "favorite" => 'boolean',
-                "href" => 'string|max:255',
-                "image" => 'string|max:255',
-                "theme" => 'in:light,dark',
-                "lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
+				"description" => 'string|max:255',
+				"email" => 'string|max:128|email',
+				"favorite" => 'boolean',
+				"href" => 'string|max:255',
+				"image" => 'string|max:255',
+				"theme" => 'in:light,dark',
+				"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 
@@ -257,37 +260,38 @@ class BoardController extends Controller {
 
             $element = Board::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);                
             }
 
             if ($request->exists('name')) {
-                $element->name = $request->name;
-            }
-            if ($request->exists('description')) {
-                $element->description = $request->description;
-            }
-            if ($request->exists('email')) {
-                $element->email = $request->email;
-            }
-            if ($request->exists('favorite')) {
-                $element->favorite = $request->favorite;
-            }
-            if ($request->exists('href')) {
-                $element->href = $request->href;
-            }
-            if ($request->exists('image')) {
-                $element->image = $request->image;
-            }
-            if ($request->exists('theme')) {
-                $element->theme = $request->theme;
-            }
-            if ($request->exists('lists')) {
-                $element->lists = $request->lists;
-            }
+				$element->name = $request->name;
+			}
+			if ($request->exists('description')) {
+				$element->description = $request->description;
+			}
+			if ($request->exists('email')) {
+				$element->email = $request->email;
+			}
+			if ($request->exists('favorite')) {
+				$element->favorite = $request->favorite;
+			}
+			if ($request->exists('href')) {
+				$element->href = $request->href;
+			}
+			if ($request->exists('image')) {
+				$element->image = $request->image;
+			}
+			if ($request->exists('theme')) {
+				$element->theme = $request->theme;
+			}
+			if ($request->exists('lists')) {
+				$element->lists = $request->lists;
+			}
 
             $element->save();
 
             return response()->json($element, 200);
+
         } catch (\Exception $e) {
 
             Log::Error('BoardController@update', ['message' => $e->getMessage()]);
@@ -310,10 +314,11 @@ class BoardController extends Controller {
 
             // Manage API language
             $this->set_locale($request);
-
+            
             $element = Board::find($id);
             if (!$element) {
                 return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
+
             }
 
             $element->delete();
@@ -324,6 +329,7 @@ class BoardController extends Controller {
             ];
 
             return response()->json($data, 200);
+
         } catch (\Exception $e) {
 
             Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
@@ -334,5 +340,6 @@ class BoardController extends Controller {
 
             return response()->json($data, 500);
         }
+
     }
 }

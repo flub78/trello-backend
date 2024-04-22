@@ -14,20 +14,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class TagController
  * @package App\Http\Controllers\api
  */
-class TagController extends Controller
-{
+class TagController extends Controller {
     //
+    protected function set_locale(Request $request) {
+        if ($request->has('lang')) {
+            $locale = strtolower($request->input('lang'));
+            if ($locale == 'gb') {
+                $locale = 'en';
+            }
 
+            if (in_array($locale, ['en', 'fr'])) {
+                App::setLocale($locale);
+            } else {
+                throw new \Exception('lang = ' . $locale . ' not supported');
+            }
+        }
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
+        
         try {
             Log::Debug('TagController@index');
 
@@ -37,6 +50,10 @@ class TagController extends Controller
             }
             $query = Tag::query();
 
+            // Manage API language
+            $this->set_locale($request);
+
+            // filtering
             if ($request->has('filter')) {
                 $filters = $queries['filter'];
 
@@ -68,6 +85,7 @@ class TagController extends Controller
                 }
             }
 
+            // sorting
             if ($request->has('sort')) {
                 $sorts = explode(',', $request->input('sort'));
                 Log::Debug('sorting by', $sorts);
@@ -80,6 +98,7 @@ class TagController extends Controller
                 }
             }
 
+            // pagination
             if ($request->has('per_page') || $request->has('page')) {
                 // request a specific page
                 $page = $request->page;
@@ -97,7 +116,7 @@ class TagController extends Controller
             Log::Error('TagController@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -107,17 +126,24 @@ class TagController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try {
             Log::Debug("TagController@show $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $element = Tag::find($id); // SELECT * FROM tags WHERE id = $id 
 
             if ($element) {
                 return response()->json($element, 200);
             } else {
-                return response()->json(['status' => 404, 'message' => "Tag $id not found"], 404);
+                return response()->json(
+                    [
+                        'status' => 404,
+                        'message' => __('api.not_found', ['elt' => $id])
+                    ], 404);
             }
 
         } catch (\Exception $e) {
@@ -125,7 +151,7 @@ class TagController extends Controller
             Log::Error('TagController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -140,6 +166,9 @@ class TagController extends Controller
         try {
             Log::Debug('TagController@store');
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 "task_id" => 'required|exists:tasks,id',
 				"task_color_id" => 'required|exists:tag_colors,id',
@@ -150,7 +179,7 @@ class TagController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('TagController@store validation failed', $data);
 
@@ -176,7 +205,7 @@ class TagController extends Controller
             Log::Error('TagController@store', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -191,6 +220,9 @@ class TagController extends Controller
         try {
             Log::Debug("TagController@update $id");
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 "task_id" => 'exists:tasks,id',
 				"task_color_id" => 'exists:tag_colors,id',
@@ -201,7 +233,7 @@ class TagController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('TagController@store validation failed', $data);
 
@@ -210,13 +242,13 @@ class TagController extends Controller
 
             $element = Tag::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "Tag $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);                
             }
 
-            if ($request->task_id) {
+            if ($request->exists('task_id')) {
 				$element->task_id = $request->task_id;
 			}
-			if ($request->task_color_id) {
+			if ($request->exists('task_color_id')) {
 				$element->task_color_id = $request->task_color_id;
 			}
 
@@ -229,7 +261,7 @@ class TagController extends Controller
             Log::Error('TagController@update', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -239,21 +271,25 @@ class TagController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             Log::Debug("TagController@delete $id");
 
+            // Manage API language
+            $this->set_locale($request);
+            
             $element = Tag::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "Tag $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
+
             }
 
             $element->delete();
 
             $data = [
                 'status' => 200,
-                'message' => "Tag $id deleted",
+                'message' => __('api.element_deleted', ['elt' => $id])
             ];
 
             return response()->json($data, 200);
@@ -263,7 +299,7 @@ class TagController extends Controller
             Log::Error('TagController@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);

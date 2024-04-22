@@ -14,20 +14,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class TaskController
  * @package App\Http\Controllers\api
  */
-class TaskController extends Controller
-{
+class TaskController extends Controller {
     //
+    protected function set_locale(Request $request) {
+        if ($request->has('lang')) {
+            $locale = strtolower($request->input('lang'));
+            if ($locale == 'gb') {
+                $locale = 'en';
+            }
 
+            if (in_array($locale, ['en', 'fr'])) {
+                App::setLocale($locale);
+            } else {
+                throw new \Exception('lang = ' . $locale . ' not supported');
+            }
+        }
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
+        
         try {
             Log::Debug('TaskController@index');
 
@@ -37,6 +50,10 @@ class TaskController extends Controller
             }
             $query = Task::query();
 
+            // Manage API language
+            $this->set_locale($request);
+
+            // filtering
             if ($request->has('filter')) {
                 $filters = $queries['filter'];
 
@@ -68,6 +85,7 @@ class TaskController extends Controller
                 }
             }
 
+            // sorting
             if ($request->has('sort')) {
                 $sorts = explode(',', $request->input('sort'));
                 Log::Debug('sorting by', $sorts);
@@ -80,6 +98,7 @@ class TaskController extends Controller
                 }
             }
 
+            // pagination
             if ($request->has('per_page') || $request->has('page')) {
                 // request a specific page
                 $page = $request->page;
@@ -97,7 +116,7 @@ class TaskController extends Controller
             Log::Error('TaskController@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -107,17 +126,24 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try {
             Log::Debug("TaskController@show $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $element = Task::find($id); // SELECT * FROM tasks WHERE id = $id 
 
             if ($element) {
                 return response()->json($element, 200);
             } else {
-                return response()->json(['status' => 404, 'message' => "Task $id not found"], 404);
+                return response()->json(
+                    [
+                        'status' => 404,
+                        'message' => __('api.not_found', ['elt' => $id])
+                    ], 404);
             }
 
         } catch (\Exception $e) {
@@ -125,7 +151,7 @@ class TaskController extends Controller
             Log::Error('TaskController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -139,6 +165,9 @@ class TaskController extends Controller
     {
         try {
             Log::Debug('TaskController@store');
+
+            // Manage API language
+            $this->set_locale($request);
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
@@ -157,7 +186,7 @@ class TaskController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('TaskController@store validation failed', $data);
 
@@ -190,7 +219,7 @@ class TaskController extends Controller
             Log::Error('TaskController@store', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -204,6 +233,9 @@ class TaskController extends Controller
     {
         try {
             Log::Debug("TaskController@update $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
@@ -222,7 +254,7 @@ class TaskController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('TaskController@store validation failed', $data);
 
@@ -231,34 +263,34 @@ class TaskController extends Controller
 
             $element = Task::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "Task $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);                
             }
 
-            if ($request->name) {
+            if ($request->exists('name')) {
 				$element->name = $request->name;
 			}
-			if ($request->description) {
+			if ($request->exists('description')) {
 				$element->description = $request->description;
 			}
-			if ($request->column_id) {
+			if ($request->exists('column_id')) {
 				$element->column_id = $request->column_id;
 			}
-			if ($request->due_date) {
+			if ($request->exists('due_date')) {
 				$element->due_date = $request->due_date;
 			}
-			if ($request->completed) {
+			if ($request->exists('completed')) {
 				$element->completed = $request->completed;
 			}
-			if ($request->image) {
+			if ($request->exists('image')) {
 				$element->image = $request->image;
 			}
-			if ($request->href) {
+			if ($request->exists('href')) {
 				$element->href = $request->href;
 			}
-			if ($request->favorite) {
+			if ($request->exists('favorite')) {
 				$element->favorite = $request->favorite;
 			}
-			if ($request->watched) {
+			if ($request->exists('watched')) {
 				$element->watched = $request->watched;
 			}
 
@@ -271,7 +303,7 @@ class TaskController extends Controller
             Log::Error('TaskController@update', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -281,21 +313,25 @@ class TaskController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             Log::Debug("TaskController@delete $id");
 
+            // Manage API language
+            $this->set_locale($request);
+            
             $element = Task::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "Task $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
+
             }
 
             $element->delete();
 
             $data = [
                 'status' => 200,
-                'message' => "Task $id deleted",
+                'message' => __('api.element_deleted', ['elt' => $id])
             ];
 
             return response()->json($data, 200);
@@ -305,7 +341,7 @@ class TaskController extends Controller
             Log::Error('TaskController@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);

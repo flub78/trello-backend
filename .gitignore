@@ -22,6 +22,6 @@ Homestead.json
 /.vagrant
 .phpunit.result.cache
 build/SETENV.BAT
-/build/results/
+/build/results
 *.bak
 .env.testing

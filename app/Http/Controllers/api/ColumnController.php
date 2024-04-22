@@ -14,20 +14,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class ColumnController
  * @package App\Http\Controllers\api
  */
-class ColumnController extends Controller
-{
+class ColumnController extends Controller {
     //
+    protected function set_locale(Request $request) {
+        if ($request->has('lang')) {
+            $locale = strtolower($request->input('lang'));
+            if ($locale == 'gb') {
+                $locale = 'en';
+            }
 
+            if (in_array($locale, ['en', 'fr'])) {
+                App::setLocale($locale);
+            } else {
+                throw new \Exception('lang = ' . $locale . ' not supported');
+            }
+        }
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
+        
         try {
             Log::Debug('ColumnController@index');
 
@@ -37,6 +50,10 @@ class ColumnController extends Controller
             }
             $query = Column::query();
 
+            // Manage API language
+            $this->set_locale($request);
+
+            // filtering
             if ($request->has('filter')) {
                 $filters = $queries['filter'];
 
@@ -68,6 +85,7 @@ class ColumnController extends Controller
                 }
             }
 
+            // sorting
             if ($request->has('sort')) {
                 $sorts = explode(',', $request->input('sort'));
                 Log::Debug('sorting by', $sorts);
@@ -80,6 +98,7 @@ class ColumnController extends Controller
                 }
             }
 
+            // pagination
             if ($request->has('per_page') || $request->has('page')) {
                 // request a specific page
                 $page = $request->page;
@@ -97,7 +116,7 @@ class ColumnController extends Controller
             Log::Error('ColumnController@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -107,17 +126,24 @@ class ColumnController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try {
             Log::Debug("ColumnController@show $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $element = Column::find($id); // SELECT * FROM columns WHERE id = $id 
 
             if ($element) {
                 return response()->json($element, 200);
             } else {
-                return response()->json(['status' => 404, 'message' => "Column $id not found"], 404);
+                return response()->json(
+                    [
+                        'status' => 404,
+                        'message' => __('api.not_found', ['elt' => $id])
+                    ], 404);
             }
 
         } catch (\Exception $e) {
@@ -125,7 +151,7 @@ class ColumnController extends Controller
             Log::Error('ColumnController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -140,6 +166,9 @@ class ColumnController extends Controller
         try {
             Log::Debug('ColumnController@store');
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
 				"board_id" => 'required|string|max:128|exists:boards,name',
@@ -151,7 +180,7 @@ class ColumnController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('ColumnController@store validation failed', $data);
 
@@ -178,7 +207,7 @@ class ColumnController extends Controller
             Log::Error('ColumnController@store', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -193,6 +222,9 @@ class ColumnController extends Controller
         try {
             Log::Debug("ColumnController@update $id");
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
 				"board_id" => 'string|max:128|exists:boards,name',
@@ -204,7 +236,7 @@ class ColumnController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('ColumnController@store validation failed', $data);
 
@@ -213,16 +245,16 @@ class ColumnController extends Controller
 
             $element = Column::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "Column $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);                
             }
 
-            if ($request->name) {
+            if ($request->exists('name')) {
 				$element->name = $request->name;
 			}
-			if ($request->board_id) {
+			if ($request->exists('board_id')) {
 				$element->board_id = $request->board_id;
 			}
-			if ($request->tasks) {
+			if ($request->exists('tasks')) {
 				$element->tasks = $request->tasks;
 			}
 
@@ -235,7 +267,7 @@ class ColumnController extends Controller
             Log::Error('ColumnController@update', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -245,21 +277,25 @@ class ColumnController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             Log::Debug("ColumnController@delete $id");
 
+            // Manage API language
+            $this->set_locale($request);
+            
             $element = Column::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "Column $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
+
             }
 
             $element->delete();
 
             $data = [
                 'status' => 200,
-                'message' => "Column $id deleted",
+                'message' => __('api.element_deleted', ['elt' => $id])
             ];
 
             return response()->json($data, 200);
@@ -269,7 +305,7 @@ class ColumnController extends Controller
             Log::Error('ColumnController@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
