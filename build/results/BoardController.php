@@ -14,20 +14,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class BoardController
  * @package App\Http\Controllers\api
  */
-class BoardController extends Controller
-{
+class BoardController extends Controller {
     //
+    protected function set_locale(Request $request) {
+        if ($request->has('lang')) {
+            $locale = strtolower($request->input('lang'));
+            if ($locale == 'gb') {
+                $locale = 'en';
+            }
 
+            if (in_array($locale, ['en', 'fr'])) {
+                App::setLocale($locale);
+            } else {
+                throw new \Exception('lang = ' . $locale . ' not supported');
+            }
+        }
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
+        
         try {
             Log::Debug('BoardController@index');
 
@@ -37,6 +50,10 @@ class BoardController extends Controller
             }
             $query = Board::query();
 
+            // Manage API language
+            $this->set_locale($request);
+
+            // filtering
             if ($request->has('filter')) {
                 $filters = $queries['filter'];
 
@@ -68,6 +85,7 @@ class BoardController extends Controller
                 }
             }
 
+            // sorting
             if ($request->has('sort')) {
                 $sorts = explode(',', $request->input('sort'));
                 Log::Debug('sorting by', $sorts);
@@ -80,6 +98,7 @@ class BoardController extends Controller
                 }
             }
 
+            // pagination
             if ($request->has('per_page') || $request->has('page')) {
                 // request a specific page
                 $page = $request->page;
@@ -97,7 +116,7 @@ class BoardController extends Controller
             Log::Error('BoardController@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -107,17 +126,24 @@ class BoardController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try {
             Log::Debug("BoardController@show $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $element = Board::find($id); // SELECT * FROM boards WHERE id = $id 
 
             if ($element) {
                 return response()->json($element, 200);
             } else {
-                return response()->json(['status' => 404, 'message' => "Board $id not found"], 404);
+                return response()->json(
+                    [
+                        'status' => 404,
+                        'message' => __('api.not_found', ['elt' => $id])
+                    ], 404);
             }
 
         } catch (\Exception $e) {
@@ -125,7 +151,7 @@ class BoardController extends Controller
             Log::Error('BoardController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -139,6 +165,9 @@ class BoardController extends Controller
     {
         try {
             Log::Debug('BoardController@store');
+
+            // Manage API language
+            $this->set_locale($request);
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
@@ -156,7 +185,7 @@ class BoardController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('BoardController@store validation failed', $data);
 
@@ -188,7 +217,7 @@ class BoardController extends Controller
             Log::Error('BoardController@store', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -202,6 +231,9 @@ class BoardController extends Controller
     {
         try {
             Log::Debug("BoardController@update $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
@@ -219,7 +251,7 @@ class BoardController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('BoardController@store validation failed', $data);
 
@@ -228,31 +260,31 @@ class BoardController extends Controller
 
             $element = Board::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "Board $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);                
             }
 
-            if ($request->name) {
+            if ($request->exists('name')) {
 				$element->name = $request->name;
 			}
-			if ($request->description) {
+			if ($request->exists('description')) {
 				$element->description = $request->description;
 			}
-			if ($request->email) {
+			if ($request->exists('email')) {
 				$element->email = $request->email;
 			}
-			if ($request->favorite) {
+			if ($request->exists('favorite')) {
 				$element->favorite = $request->favorite;
 			}
-			if ($request->href) {
+			if ($request->exists('href')) {
 				$element->href = $request->href;
 			}
-			if ($request->image) {
+			if ($request->exists('image')) {
 				$element->image = $request->image;
 			}
-			if ($request->theme) {
+			if ($request->exists('theme')) {
 				$element->theme = $request->theme;
 			}
-			if ($request->lists) {
+			if ($request->exists('lists')) {
 				$element->lists = $request->lists;
 			}
 
@@ -265,7 +297,7 @@ class BoardController extends Controller
             Log::Error('BoardController@update', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -275,21 +307,25 @@ class BoardController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             Log::Debug("BoardController@delete $id");
 
+            // Manage API language
+            $this->set_locale($request);
+            
             $element = Board::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "Board $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
+
             }
 
             $element->delete();
 
             $data = [
                 'status' => 200,
-                'message' => "Board $id deleted",
+                'message' => __('api.element_deleted', ['elt' => $id])
             ];
 
             return response()->json($data, 200);
@@ -299,7 +335,7 @@ class BoardController extends Controller
             Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);

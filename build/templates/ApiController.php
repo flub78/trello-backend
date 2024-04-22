@@ -14,20 +14,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class {{class}}Controller
  * @package App\Http\Controllers\api
  */
-class {{class}}Controller extends Controller
-{
+class {{class}}Controller extends Controller {
     //
+    protected function set_locale(Request $request) {
+        if ($request->has('lang')) {
+            $locale = strtolower($request->input('lang'));
+            if ($locale == 'gb') {
+                $locale = 'en';
+            }
 
+            if (in_array($locale, ['en', 'fr'])) {
+                App::setLocale($locale);
+            } else {
+                throw new \Exception('lang = ' . $locale . ' not supported');
+            }
+        }
+    }
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
+        
         try {
             Log::Debug('{{class}}Controller@index');
 
@@ -37,6 +50,10 @@ class {{class}}Controller extends Controller
             }
             $query = {{class}}::query();
 
+            // Manage API language
+            $this->set_locale($request);
+
+            // filtering
             if ($request->has('filter')) {
                 $filters = $queries['filter'];
 
@@ -68,6 +85,7 @@ class {{class}}Controller extends Controller
                 }
             }
 
+            // sorting
             if ($request->has('sort')) {
                 $sorts = explode(',', $request->input('sort'));
                 Log::Debug('sorting by', $sorts);
@@ -80,6 +98,7 @@ class {{class}}Controller extends Controller
                 }
             }
 
+            // pagination
             if ($request->has('per_page') || $request->has('page')) {
                 // request a specific page
                 $page = $request->page;
@@ -97,7 +116,7 @@ class {{class}}Controller extends Controller
             Log::Error('{{class}}Controller@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -107,17 +126,24 @@ class {{class}}Controller extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try {
             Log::Debug("{{class}}Controller@show $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $element = {{class}}::find($id); // SELECT * FROM {{element}}s WHERE id = $id 
 
             if ($element) {
                 return response()->json($element, 200);
             } else {
-                return response()->json(['status' => 404, 'message' => "{{class}} $id not found"], 404);
+                return response()->json(
+                    [
+                        'status' => 404,
+                        'message' => __('api.not_found', ['elt' => $id])
+                    ], 404);
             }
 
         } catch (\Exception $e) {
@@ -125,7 +151,7 @@ class {{class}}Controller extends Controller
             Log::Error('{{class}}Controller@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -140,6 +166,9 @@ class {{class}}Controller extends Controller
         try {
             Log::Debug('{{class}}Controller@store');
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 {{#cg}} create_validation_rules 4 {{/cg}}
             ]);
@@ -148,7 +177,7 @@ class {{class}}Controller extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('{{class}}Controller@store validation failed', $data);
 
@@ -172,7 +201,7 @@ class {{class}}Controller extends Controller
             Log::Error('{{class}}Controller@store', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -187,6 +216,9 @@ class {{class}}Controller extends Controller
         try {
             Log::Debug("{{class}}Controller@update $id");
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 {{#cg}} update_validation_rules {{/cg}}
             ]);
@@ -195,7 +227,7 @@ class {{class}}Controller extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('{{class}}Controller@store validation failed', $data);
 
@@ -204,7 +236,7 @@ class {{class}}Controller extends Controller
 
             $element = {{class}}::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "{{class}} $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);                
             }
 
             {{#cg}} update_set_attributes {{/cg}}
@@ -217,7 +249,7 @@ class {{class}}Controller extends Controller
             Log::Error('{{class}}Controller@update', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -227,21 +259,25 @@ class {{class}}Controller extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             Log::Debug("{{class}}Controller@delete $id");
 
+            // Manage API language
+            $this->set_locale($request);
+            
             $element = {{class}}::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "{{class}} $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
+
             }
 
             $element->delete();
 
             $data = [
                 'status' => 200,
-                'message' => "{{class}} $id deleted",
+                'message' => __('api.element_deleted', ['elt' => $id])
             ];
 
             return response()->json($data, 200);
@@ -251,7 +287,7 @@ class {{class}}Controller extends Controller
             Log::Error('{{class}}Controller@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);

@@ -126,7 +126,8 @@ class BoardController extends Controller {
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, $id) {
+    public function show(Request $request, $id)
+    {
         try {
             Log::Debug("BoardController@show $id");
 
@@ -142,16 +143,14 @@ class BoardController extends Controller {
                     [
                         'status' => 404,
                         'message' => __('api.not_found', ['elt' => $id])
-                    ],
-                    404
-                );
+                    ], 404);
             }
         } catch (\Exception $e) {
 
             Log::Error('BoardController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => __('api.internal_error'),
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -161,7 +160,8 @@ class BoardController extends Controller {
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         try {
             Log::Debug('BoardController@store');
 
@@ -184,7 +184,7 @@ class BoardController extends Controller {
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => __('api.validation_error'),
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('BoardController@store validation failed', $data);
 
@@ -224,7 +224,8 @@ class BoardController extends Controller {
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         try {
             Log::Debug("BoardController@update $id");
 
@@ -247,7 +248,7 @@ class BoardController extends Controller {
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => __('api.validation_error'),
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('BoardController@store validation failed', $data);
 
@@ -292,7 +293,7 @@ class BoardController extends Controller {
             Log::Error('BoardController@update', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => __('api.internal_error'),
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -302,7 +303,8 @@ class BoardController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, $id) {
+    public function destroy(Request $request, $id)
+    {
         try {
             Log::Debug("BoardController@delete $id");
 
@@ -327,7 +329,7 @@ class BoardController extends Controller {
             Log::Error('BoardController@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => __('api.internal_error'),
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
