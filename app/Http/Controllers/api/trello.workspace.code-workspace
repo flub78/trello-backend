@@ -10,5 +10,7 @@
 			"path": "../../../../../ddd-gen"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "trello-backend"
+	}
 }

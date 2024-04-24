@@ -1,0 +1,275 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0-oas3
+  title: Trello clone API
+  description: An API to handle tasks, tasks lists and boards, The code of the server is there https://github.com/flub78/trello-backend
+paths:
+  /boards:
+    get:
+      summary: Get the list of boards
+      tags: [boards]
+      description: List with filter, sorting and pagination
+      parameters:
+        - $ref: "#/components/parameters/LangParameter"
+        - $ref: "#/components/parameters/FilterParameter"
+        - $ref: "#/components/parameters/SortParameter"
+        - $ref: "#/components/parameters/PageParameters"
+        - $ref: "#/components/parameters/PerPageParameters"
+
+      responses:
+        "200":
+          description: An array of boards
+          content:
+            "*.*":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Board"
+
+        "500":
+          $ref: "#/components/responses/500InternalServerError"
+    post:
+      summary: Create a board
+      tags: [boards]
+      description: Create a board
+      parameters:
+        - $ref: "#/components/parameters/LangParameter"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - name
+              $ref: "#/components/schemas/Board"
+      responses:
+        "201":
+          $ref: "#/components/responses/201Created"
+        "422":
+          $ref: "#/components/responses/422ValidationFailed"
+        "500":
+          $ref: "#/components/responses/500InternalServerError"
+  /boards/{boardId}:
+    get:
+      summary: Get a board
+      tags: [boards]
+      description: Get a board by id
+      parameters:
+        - $ref: "#/components/parameters/BoardIdParameter"
+        - $ref: "#/components/parameters/LangParameter"
+
+      responses:
+        "200":
+          description: A board
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/Board"
+        "404":
+          $ref: "#/components/responses/404NotFound"
+
+        "500":
+          $ref: "#/components/responses/500InternalServerError"
+
+    delete:
+      summary: Delete a board
+      tags: [boards]
+      description: Delete a board by id
+      parameters:
+        - $ref: "#/components/parameters/BoardIdParameter"
+        - $ref: "#/components/parameters/LangParameter"
+
+      responses:
+        "200":
+          $ref: "#/components/responses/200OK"
+        "404":
+          $ref: "#/components/responses/404NotFound"
+        "500":
+          $ref: "#/components/responses/500InternalServerError"
+    put:
+      summary: Update a board
+      tags: [boards]
+      description: Update a board by id
+      parameters:
+        - $ref: "#/components/parameters/BoardIdParameter"
+        - $ref: "#/components/parameters/LangParameter"
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - name
+              $ref: "#/components/schemas/Board"
+
+      responses:
+        "200":
+          $ref: "#/components/responses/200OK"
+        "404":
+          $ref: "#/components/responses/404NotFound"
+        "422":
+          $ref: "#/components/responses/422ValidationFailed"
+        "500":
+          $ref: "#/components/responses/500InternalServerError"
+  /tasks:
+    get:
+      summary: Gets a list of tasks to do
+      tags: [tasks]
+      description: Returns a list containing all tasks.
+      parameters:
+        - $ref: "#/components/parameters/LangParameter"
+      responses:
+        "200":
+          description: tasks
+          content:
+            "*/*":
+              schema:
+                type: array
+                items:
+                  required:
+                    - username
+                  properties:
+                    _id:
+                      type: string
+                    name:
+                      type: string
+                    Created_date:
+                      type: string
+                    _v:
+                      type: string
+                    status:
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                          - pending
+                          - ongoing
+                          - completed
+    post:
+      summary: Create a todo list element
+      tags: [tasks]
+      description: Create a todo list element
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+        description: The task to create
+      responses:
+        "200":
+          description: OK
+servers:
+  - url: https://virtserver.swaggerhub.com/flub78/todoList/1.0.0
+  - url: http://virtserver.swaggerhub.com/flub78/todoList/1.0.0
+  - url: http://localhost:3000
+
+components:
+  schemas:
+    Board:
+      type: object
+      description: Board information. A board has attributes and contains columns
+      properties:
+        name:
+          type: string
+          example: forest
+        description:
+          type: string
+          example: >-
+            Qui delectus dolor facilis ipsam fuga id eos harum quas  voluptates.
+        email:
+          type: string
+          example: bode.otis@example.org
+        favorite:
+          type: integer
+          format: int32
+          example: 0
+        read_at:
+          type: string
+          format: nullable
+        href:
+          type: string
+          example: board/forest
+        image:
+          type: string
+          example: IMG_20210425_145446.jpg
+        theme:
+          type: string
+          example: light
+        lists:
+          type: string
+          example: qui non ad tempora modi eum
+        created_at:
+          type: string
+          example: "2024-04-21T11:29:37.000Z"
+        updated_at:
+          type: string
+          example: "2024-04-21T11:29:37.000Z"
+
+  responses:
+    200OK:
+      description: OK
+
+    201Created:
+      description: Board created
+
+    404NotFound:
+      description: Board not found
+
+    422ValidationFailed:
+      description: Validation failed
+
+    500InternalServerError:
+      description: Internal server error
+
+  parameters:
+    LangParameter:
+      name: lang
+      in: query
+      description: Locale for error messages
+      required: false
+      schema:
+        type: string
+        enum: [en, fr]
+
+    FilterParameter:
+      name: filter
+      in: query
+      description: Filter the boards
+      required: false
+      schema:
+        type: string
+
+    SortParameter:
+      name: sort
+      in: query
+      description: Sort the boards
+      required: false
+      schema:
+        type: string
+
+    PageParameters:
+      name: page
+      in: query
+      description: Page number
+      required: false
+      schema:
+        type: integer
+
+    PerPageParameters:
+      name: per_page
+      in: query
+      description: Number of items per page
+      required: false
+      schema:
+        type: integer
+
+    BoardIdParameter:
+      name: boardId
+      in: path
+      description: ID of the board
+      required: true
+      schema:
+        type: string

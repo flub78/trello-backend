@@ -1,0 +1,236 @@
+/boards:
+  get:
+    summary: Get the list of boards
+    tags: [boards]
+    description: List with filter, sorting and pagination
+    parameters:
+      - name: lang
+        in: query
+        description: Locale for error messages
+        required: false
+        schema:
+          type: string
+          enum: [en, fr]
+      - name: filter
+        in: query
+        description: Filter the boards
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: Sort the boards
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number
+        required: false
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        description: Number of items per page
+        required: false
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: An array of boards
+        content:
+          "*.*":
+            schema:
+              type: array
+              items:
+                properties:
+                  name:
+                    type: string
+                    example: forest
+                  description:
+                    type: string
+                    example: >-
+                      Qui delectus dolor facilis ipsam fuga id eos harum quas
+                      voluptates.
+                  email:
+                    type: string
+                    example: bode.otis@example.org
+                  favorite:
+                    type: integer
+                    format: int32
+                    example: 0
+                  read_at:
+                    type: string
+                    format: nullable
+                  href:
+                    type: string
+                    example: board/forest
+                  image:
+                    type: string
+                    example: IMG_20210425_145446.jpg
+                  theme:
+                    type: string
+                    example: light
+                  lists:
+                    type: string
+                    example: qui non ad tempora modi eum
+                  created_at:
+                    type: string
+                    example: "2024-04-21T11:29:37.000Z"
+                  updated_at:
+                    type: string
+                    example: "2024-04-21T11:29:37.000Z"
+      "500":
+        description: Internal server error
+  post:
+    summary: Create a board
+    tags: [boards]
+    description: Create a board
+    parameters:
+      - name: lang
+        in: query
+        description: Locale for error messages
+        required: false
+        schema:
+          type: string
+          enum: [en, fr]
+    requestBody:
+      content:
+        application/json:
+          schema:
+            required:
+              - name
+            properties:
+              name:
+                type: string
+                example: forest
+              description:
+                type: string
+                example: >-
+                  Qui delectus dolor facilis ipsam fuga id eos harum quas
+                  voluptates.
+              email:
+                type: string
+                example:
+    responses:
+      "200":
+        description: OK
+      "422":
+        description: Validation failed
+      "500":
+        description: Internal server error
+/boards/{boardId}:
+  get:
+    summary: Get a board
+    tags: [boards]
+    description: Get a board by id
+    parameters:
+      - name: lang
+        in: query
+        description: Locale for error messages
+        required: false
+        schema:
+          type: string
+          enum: [en, fr]
+
+      - name: boardId
+        in: path
+        description: ID of the board to return
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: A board
+        content:
+          "*/*":
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: forest
+                description:
+                  type: string
+                  example: >-
+                    Qui delectus dolor facilis ipsam fuga id eos harum quas
+                    voluptates.
+                email:
+                  type: string
+                  example:
+      "404":
+        description: Board not found
+      "500":
+        description: Internal server error
+
+  delete:
+    summary: Delete a board
+    tags: [boards]
+    description: Delete a board by id
+    parameters:
+      - name: lang
+        in: query
+        description: Locale for error messages
+        required: false
+        schema:
+          type: string
+          enum: [en, fr]
+      - name: boardId
+        in: path
+        description: ID of the board to delete
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: OK
+      "404":
+        description: Board not found
+      "500":
+        description: Internal server error
+  put:
+    summary: Update a board
+    tags: [boards]
+    description: Update a board by id
+    parameters:
+      - name: boardId
+        in: path
+        description: ID of the board to update
+        required: true
+        schema:
+          type: integer
+      - name: lang
+        in: query
+        description: Locale for error messages
+        required: false
+        schema:
+          type: string
+          enum: [en, fr]
+
+    requestBody:
+      content:
+        application/json:
+          schema:
+            required:
+              - name
+            properties:
+              name:
+                type: string
+                example: forest
+              description:
+                type: string
+                example: >-
+                  Qui delectus dolor facilis ipsam fuga id eos harum quas
+                  voluptates.
+              email:
+                type: string
+                example:
+    responses:
+      "200":
+        description: OK
+      "404":
+        description: Board not found
+      "422":
+        description: Validation failed
+      "500":
+        description: Internal server error
