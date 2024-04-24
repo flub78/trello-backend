@@ -3,6 +3,10 @@ info:
   version: 1.0.0-oas3
   title: Trello clone API
   description: An API to handle tasks, tasks lists and boards, The code of the server is there https://github.com/flub78/trello-backend
+
+security:
+  - bearerAuth: [] # use the bearerAuth security scheme
+
 paths:
   /boards:
     get:
@@ -26,6 +30,9 @@ paths:
                 items:
                   $ref: "#/components/schemas/Board"
 
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
         "500":
           $ref: "#/components/responses/500InternalServerError"
     post:
@@ -44,17 +51,19 @@ paths:
       responses:
         "201":
           $ref: "#/components/responses/201Created"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "422":
           $ref: "#/components/responses/422ValidationFailed"
         "500":
           $ref: "#/components/responses/500InternalServerError"
-  /boards/{boardId}:
+  /boards/{Id}:
     get:
       summary: Get a board
       tags: [boards]
       description: Get a board by id
       parameters:
-        - $ref: "#/components/parameters/BoardIdParameter"
+        - $ref: "#/components/parameters/IdParameter"
         - $ref: "#/components/parameters/LangParameter"
 
       responses:
@@ -64,6 +73,8 @@ paths:
             "*/*":
               schema:
                 $ref: "#/components/schemas/Board"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "404":
           $ref: "#/components/responses/404NotFound"
 
@@ -75,12 +86,14 @@ paths:
       tags: [boards]
       description: Delete a board by id
       parameters:
-        - $ref: "#/components/parameters/BoardIdParameter"
+        - $ref: "#/components/parameters/IdParameter"
         - $ref: "#/components/parameters/LangParameter"
 
       responses:
         "200":
           $ref: "#/components/responses/200OK"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "404":
           $ref: "#/components/responses/404NotFound"
         "500":
@@ -90,7 +103,7 @@ paths:
       tags: [boards]
       description: Update a board by id
       parameters:
-        - $ref: "#/components/parameters/BoardIdParameter"
+        - $ref: "#/components/parameters/IdParameter"
         - $ref: "#/components/parameters/LangParameter"
 
       requestBody:
@@ -104,6 +117,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/200OK"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "404":
           $ref: "#/components/responses/404NotFound"
         "422":
@@ -213,10 +228,13 @@ components:
       description: OK
 
     201Created:
-      description: Board created
+      description: Element created
+
+    UnauthorizedError:
+      description: Access token is missing or invalid
 
     404NotFound:
-      description: Board not found
+      description: Element not found
 
     422ValidationFailed:
       description: Validation failed
@@ -237,7 +255,7 @@ components:
     FilterParameter:
       name: filter
       in: query
-      description: Filter the boards
+      description: Filter the list
       required: false
       schema:
         type: string
@@ -245,7 +263,7 @@ components:
     SortParameter:
       name: sort
       in: query
-      description: Sort the boards
+      description: Sort the list
       required: false
       schema:
         type: string
@@ -266,10 +284,16 @@ components:
       schema:
         type: integer
 
-    BoardIdParameter:
-      name: boardId
+    IdParameter:
+      name: Id
       in: path
-      description: ID of the board
+      description: ID of the element
       required: true
       schema:
         type: string
+
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # optional, arbitrary value for documentation purposes
