@@ -47,7 +47,8 @@ class DatabaseSeeder extends Seeder {
         $cl = [];
         for ($i = 0; $i < 10; $i++) {
             $cl[] = Column::factory()->create(["name" => "col " . $i, "board_id" => "gvv"])->id;
-        }
+            $this->call(MetadataTableSeeder::class);
+    }
 
         $gvv = Board::find("gvv");
         $gvv->lists = '"' . implode('", "', $cl) . '"';
