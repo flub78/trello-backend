@@ -71,4 +71,14 @@ Using postman
         "message": "Unauthenticated."
     }
 
+ 	Postman
+		POST	http://127.0.0.1:8000/api/register
+				name=toto
+				email=toto@gmail.com
+				password=toto
+				
+				header
+					accept	application/json
+					
+			"token": "2|6RExY7tXKV4frqRTE6fZnkraxalefXXoUI9gpWO48c9a58c1"   
     

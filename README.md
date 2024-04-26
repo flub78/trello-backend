@@ -4,7 +4,11 @@ Laravel backend for the Trello project
 
 It is a REST API for boards, lists and tasks.
 
-## Starint a development server
+But it is mainly a workbench to experiment on full stack WEB development.
+
+The idea is to experiment on REST APIs served by Laravel using MySql and to have clients developed in React.
+
+## Starting a development server
 
 in development:
 
@@ -19,7 +23,7 @@ The project is available at http://127.0.0.1:8000/
 
 It is then possible to register new users and login. 
 
-(Todo chack how to disable registration.)
+(Todo: check how to disable registration.)
 
 ## Development steps
 
@@ -50,7 +54,7 @@ database boards
 user xxx
 password yyy
 
-copy the database credentiel into the .env file
+copy the database credentials into the .env file
 and migrate the database
 
     php artisan migrate
@@ -214,6 +218,16 @@ it creates the file app/database/migrations/2024_03_02_174125_create_boards_tabl
 
     php artisan test --filter=Api	
  	php artisan test --testsuite=Unit
-	php artisan test --testsuite=Feature   
+	php artisan test --testsuite=Feature
+
+    php artisan test --stop-on-failure --filter=TagModel
+
+	php artisan test  tests\Unit\BoardModelTest.php
+	php artisan test  tests\Unit\ChecklistItemModelTest.php
+	php artisan test  tests\Unit\ChecklistModelTest.php
+
+	php artisan test  tests\Unit\ColumnModelTest.php
+	php artisan test  tests\Unit\ExampleTest.php
+	php artisan test  tests\Unit\SchemaModelTest.php		delete the tasks ...       
 
     
