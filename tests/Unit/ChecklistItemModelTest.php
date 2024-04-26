@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is generated from a template with metadata extracted from the data model.
  * If modifications are required, it is important to consider if they should be done in the template
@@ -16,8 +17,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 /**
  * Test the ChecklistItem model
  */
-class ChecklistItemModelTest extends TestCase
-{
+class ChecklistItemModelTest extends TestCase {
+
+    use RefreshDatabase;
+
+    public $seed = true;
     protected $log = true;
 
     /**
@@ -27,8 +31,7 @@ class ChecklistItemModelTest extends TestCase
      * When creating an element
      * Then it is stored in database, it can be read, updated and deleted
      */
-    public function testCRUD(): void
-    {
+    public function testCRUD(): void {
         $initial_count = ChecklistItem::count();
         if ($this->log) {
             Log::info("ChecklistItemModelTest.testCRUD initial_count: $initial_count");
@@ -39,7 +42,9 @@ class ChecklistItemModelTest extends TestCase
         $elt1_key = $elt1->id;  // if the primary key is provided by the factory
         $this->assertNotNull($elt1, "the element 1 has been created");
         $this->assertTrue($elt1->save(), "the element 1 has been saved in database");
-        if ('id' == 'id')  {$elt1_key = $elt1->id;} // if the primary key is auto incremented
+        if ('id' == 'id') {
+            $elt1_key = $elt1->id;
+        } // if the primary key is auto incremented
 
         $elt2 = ChecklistItem::factory()->make();
         $elt2_key = $elt2->id;  // if the primary key is provided by the factory
@@ -102,6 +107,5 @@ class ChecklistItemModelTest extends TestCase
         if ($this->log) {
             Log::info("ChecklistItemModelTest.testCRUD final_count: $final_count");
         }
-
     }
 }
