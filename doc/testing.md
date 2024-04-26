@@ -45,10 +45,16 @@ At some point I will need a same mode to reset the database before every test. A
 
 ```
   php artisan test
+  php artisan test --stop-on-failure
   php artisan test --testsuite=Unit
   php artisan test --testsuite=Feature
 
   php artisan test --filter=BoardModel
   php artisan test --filter=TagColorModel
   php artisan test --filter=BoardAPiController
+
+  php artisan test  tests\Unit\BoardModelTest.php
+  php artisan test  tests\Unit\ChecklistItemModelTest.php
+  php artisan test  tests\Unit\ChecklistModelTest.php
+
 ```
