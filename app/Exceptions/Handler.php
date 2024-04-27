@@ -33,7 +33,7 @@ class Handler extends ExceptionHandler {
      */
     public function render($request, Throwable $exception) {
         if ($exception instanceof AuthenticationException) {
-            return response()->json(["error" => 401, "message" => "authenticate failed"]);
+            return response()->json(["error" => 401, "message" => "authentication failed"]);
         }
         return parent::render($request, $exception);
     }
