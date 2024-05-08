@@ -67,7 +67,7 @@ class BoardModelTest extends TestCase
         // for csv_high_variability_fields
         // fields with low variability cannot be compared as they could be identical between two elements
         $diff = 0;
-        $high_variability_fields = ["description", "href", "image", "lists"];
+        $high_variability_fields = ["description", "href", "picture"];
         foreach ($high_variability_fields as $key) {
             if ($relt2->$key != $relt3->$key) {
                 $diff++;

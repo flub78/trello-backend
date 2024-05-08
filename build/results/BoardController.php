@@ -175,9 +175,9 @@ class BoardController extends Controller {
 				"email" => 'required|string|max:128|email',
 				"favorite" => 'required|boolean',
 				"href" => 'string|max:255',
-				"image" => 'string|max:255',
+				"picture" => 'string|max:255',
 				"theme" => 'in:light,dark',
-				"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
+				"lists" => 'string|max:255',
 
             ]);
 
@@ -198,7 +198,7 @@ class BoardController extends Controller {
 			$element->email = $request->email;
 			$element->favorite = $request->favorite;
 			$element->href = $request->href;
-			$element->image = $request->image;
+			$element->picture = $request->picture;
 			$element->theme = $request->theme;
 			$element->lists = $request->lists;
 
@@ -241,9 +241,9 @@ class BoardController extends Controller {
 				"email" => 'string|max:128|email',
 				"favorite" => 'boolean',
 				"href" => 'string|max:255',
-				"image" => 'string|max:255',
+				"picture" => 'string|max:255',
 				"theme" => 'in:light,dark',
-				"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
+				"lists" => 'string|max:255',
 
             ]);
 
@@ -278,8 +278,8 @@ class BoardController extends Controller {
 			if ($request->exists('href')) {
 				$element->href = $request->href;
 			}
-			if ($request->exists('image')) {
-				$element->image = $request->image;
+			if ($request->exists('picture')) {
+				$element->picture = $request->picture;
 			}
 			if ($request->exists('theme')) {
 				$element->theme = $request->theme;

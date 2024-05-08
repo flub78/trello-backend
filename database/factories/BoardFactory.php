@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is generated from a template with metadata extracted from the data model.
  * If modifications are required, it is important to consider if they should be done in the template
@@ -28,22 +29,22 @@ class BoardFactory extends Factory
      * @return array
      */
     public function definition() {
-        $count = Board::count ();
+        $count = Board::count();
         $next = $count + 1;
-        
+
         return [
-            'name' => $this->faker->unique()->word,
-			'description' => $this->faker->sentence(10),
-			'email' => $this->faker->unique()->safeEmail,
-			'favorite' => $this->faker->boolean,
-			'href' => $this->faker->sentence(7),
-			'image' => $this->faker->word,
-			'theme' => $this->faker->randomElement(['light', 'dark']),
-			'lists' => $this->faker->csv_string(6),
+            'name' => $this->faker->unique()->name,
+			'description' => $this->faker->sentence(17),
+            'email' => $this->faker->unique()->safeEmail,
+            'favorite' => $this->faker->boolean,
+			'href' => $this->faker->sentence(17),
+			'picture' => $this->faker->sentence(17),
+            'theme' => $this->faker->randomElement(['light', 'dark']),
+            'lists' => $this->faker->csv_string(6),
 
         ];
     }
-    
+
     /**
      * return a list of erroneous fields and associated expected errors 
      * [
@@ -56,10 +57,10 @@ class BoardFactory extends Factory
      * ]
      * @return string[]
      */
-    public function error_cases () {
+    public function error_cases() {
         $scenarios = [];
         // $scenarios[] = ["fields" => [], "errors" => ["name" => "The name field is required."]];
         // $scenarios[] = ["fields" => ["name" => $bad_name], "errors" => ["name" => "The name must not be greater than 255 characters."]];
-       return $scenarios;       
+        return $scenarios;
     }
 }

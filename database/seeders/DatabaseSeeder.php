@@ -27,9 +27,9 @@ class DatabaseSeeder extends Seeder {
         // Populate Boards
         TagColor::factory(4)->create();
 
-        $webapp = Board::factory()->create(["name" => "webapp", "href" => "board/webapp", "image" => "code_editor.jpg"]);
-        $gvv = Board::factory()->create(["name" => "gvv", "href" => "board/gvv", "image" => "20230903_151040.jpg"]);
-        $forest = Board::factory()->create(["name" => "forest", "href" => "board/forest", "image" => "IMG_20210425_145446.jpg"]);
+        $webapp = Board::factory()->create(["name" => "webapp", "href" => "board/webapp", "picture" => "code_editor.jpg"]);
+        $gvv = Board::factory()->create(["name" => "gvv", "href" => "board/gvv", "picture" => "20230903_151040.jpg"]);
+        $forest = Board::factory()->create(["name" => "forest", "href" => "board/forest", "picture" => "IMG_20210425_145446.jpg"]);
 
         // factory-create returns an object but the primary key is not set
 
@@ -48,7 +48,7 @@ class DatabaseSeeder extends Seeder {
         for ($i = 0; $i < 10; $i++) {
             $cl[] = Column::factory()->create(["name" => "col " . $i, "board_id" => "gvv"])->id;
             $this->call(MetadataTableSeeder::class);
-    }
+        }
 
         $gvv = Board::find("gvv");
         $gvv->lists = '"' . implode('", "', $cl) . '"';

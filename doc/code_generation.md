@@ -9,8 +9,9 @@ In a windows console:
     cd build
     setenv.bat
 
-    workflow boards -c api_controller -a compare
+    workflow -a compare -c api_controller boards
+    workflow -a compare -c api_model boards
+    workflow -a compare -c factory boards
+    workflow -a compare -c test_model boards
+    workflow -a compare -c test_api boards
 
-    workflow boards -c model_test -a install boards
-    workflow boards -c model_test -a install columns
-    workflow boards -c model_test -a install boards
