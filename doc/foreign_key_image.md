@@ -1,14 +1,23 @@
 # Foreign keys image
 
-When an object containing a foreign key is created or updated the user has to fill the foreign key field. Sometimes it is a string in which case the user could type it. But when it is an integer and the number of element in the target table is big we have to find a more convenient way.
+With foreign keys in a table, it is required to display the element value to the user. We need a string representation the the referenced elements.
 
-The more convenient appraoch is to define a unique human readable string.
+This string can be used to select an element in the target table or to display its value in a human readable way. The primary key is usually not usable especially if it is an auto incremented integer.
+
+The best approach is to define a unique human readable string to identify every elements.
 
 * The string can be defined by the user
 * or computed from others attributes.
 
-Il the string is contained into a table field named image and set by the user, it is relatively easy to check that the string is unique. The image field can even be used as primary key even if it not recommended to use application information as primary key (remember the spelling mistake in a last name and the difficulty to fix it).
+Laravel computed attributes are not really usable in this context because they cannot be used in queries (you cannot query the database on information that the database does not know...).
 
-If the string is computed, for exemple a flight made by a pilot at a certain time on some machine, the validation rules must gurantee that the computed string is unique.
+It is more convenient to include a special column in the model, and to compute its value from others attributes if necessary.
 
-So in our case selectors should use 
+By convention, I'll use string_id and string_id_short to uniquely identify elements in the table. The short version may be used when there is limited place on the display.
+
+These strings can be used to implement several types of display ans selector in the frontend.
+
+To check: is it possible to use laravel validation on computed attributes ? 
+
+    https://stackoverflow.com/questions/47168082/how-to-make-a-validation-on-a-calculated-field-in-laravel-5-5
+
