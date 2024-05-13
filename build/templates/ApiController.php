@@ -37,7 +37,7 @@ class {{class}}Controller extends Controller {
         }
     }
     /**
-     * Display a listing of the resource.
+     * Display a list of the resource.
      */
     public function index(Request $request) {
         
