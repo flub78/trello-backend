@@ -14,8 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 
 
-class BoardFactory extends Factory
-{
+class BoardFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -32,17 +31,19 @@ class BoardFactory extends Factory
         $count = Board::count();
         $next = $count + 1;
 
-        return [
+        $res = [
             'name' => $this->faker->unique()->name,
-			'description' => $this->faker->sentence(17),
+            'description' => $this->faker->sentence(17),
             'email' => $this->faker->unique()->safeEmail,
             'favorite' => $this->faker->boolean,
-			'href' => $this->faker->sentence(17),
-			'picture' => $this->faker->sentence(17),
+            'href' => $this->faker->sentence(17),
+            'picture' => $this->faker->sentence(17),
             'theme' => $this->faker->randomElement(['light', 'dark']),
             'lists' => $this->faker->csv_string(6),
-
         ];
+        $res['image'] = $res['name'];
+
+        return $res;
     }
 
     /**

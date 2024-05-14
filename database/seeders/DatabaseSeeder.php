@@ -27,16 +27,16 @@ class DatabaseSeeder extends Seeder {
         // Populate Boards
         TagColor::factory(4)->create();
 
-        $webapp = Board::factory()->create(["name" => "webapp", "href" => "board/webapp", "picture" => "code_editor.jpg"]);
-        $gvv = Board::factory()->create(["name" => "gvv", "href" => "board/gvv", "picture" => "20230903_151040.jpg"]);
-        $forest = Board::factory()->create(["name" => "forest", "href" => "board/forest", "picture" => "IMG_20210425_145446.jpg"]);
+        $webapp = Board::factory()->create(["name" => "webapp", "href" => "board/webapp", "picture" => "code_editor.jpg", "image" => "WEBAPP"]);
+        $gvv = Board::factory()->create(["name" => "gvv", "href" => "board/gvv", "picture" => "20230903_151040.jpg", "image" => "GVV"]);
+        $forest = Board::factory()->create(["name" => "forest", "href" => "board/forest", "picture" => "IMG_20210425_145446.jpg", "image" => "Forest"]);
 
         // factory-create returns an object but the primary key is not set
 
         // Populate columns
-        $webapp_c1 = Column::factory()->create(["name" => "todo", "board_id" => "webapp"])->id;
-        $webapp_c2 = Column::factory()->create(["name" => "In progress", "board_id" => "webapp"])->id;
-        $webapp_c3 = Column::factory()->create(["name" => "done", "board_id" => "webapp"])->id;
+        $webapp_c1 = Column::factory()->create(["name" => "todo", "board_id" => "webapp", "image" => "ToDo"])->id;
+        $webapp_c2 = Column::factory()->create(["name" => "In progress", "board_id" => "webapp", "image" => "In Progress"])->id;
+        $webapp_c3 = Column::factory()->create(["name" => "done", "board_id" => "webapp", "image" => "Don"])->id;
 
         $webapp_list = implode(", ", ['"' . $webapp_c1 . '"', '"' . $webapp_c2 . '"', '"' . $webapp_c3 . '"']);
 
@@ -56,14 +56,14 @@ class DatabaseSeeder extends Seeder {
 
         // populate tasks
 
-        Task::factory()->create(["name" => "task 1", "column_id" => $webapp_c1]);
-        Task::factory()->create(["name" => "task 2", "column_id" => $webapp_c1]);
-        Task::factory()->create(["name" => "task 3", "column_id" => $webapp_c1]);
+        Task::factory()->create(["name" => "task 1", "column_id" => $webapp_c1, "image" => "T 1"]);
+        Task::factory()->create(["name" => "task 2", "column_id" => $webapp_c1, "image" => "T 2"]);
+        Task::factory()->create(["name" => "task 3", "column_id" => $webapp_c1, "image" => "T 3"]);
 
-        Task::factory()->create(["name" => "task 4", "column_id" => $webapp_c2]);
+        Task::factory()->create(["name" => "task 4", "column_id" => $webapp_c2, "image" => "T 4"]);
 
-        Task::factory()->create(["name" => "task 5", "column_id" => $webapp_c3]);
-        Task::factory()->create(["name" => "task 6", "column_id" => $webapp_c3]);
+        Task::factory()->create(["name" => "task 5", "column_id" => $webapp_c3, "image" => "T 5"]);
+        Task::factory()->create(["name" => "task 6", "column_id" => $webapp_c3, "image" => "T 6"]);
 
         // Populate checklists
 

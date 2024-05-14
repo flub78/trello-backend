@@ -19,6 +19,7 @@ return new class extends Migration {
                 ->comment('{"fillable": "false"}');
             $table->string('href')->nullable();
             $table->string('picture')->nullable();
+            $table->string('image')->unique();
             $table->enum('theme', ['light', 'dark'])->default('light')->nullable();
             $table->string('lists')->nullable()
                 ->comment('{"subtype": "csv_string"}');

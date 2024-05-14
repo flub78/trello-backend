@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is generated from a template with metadata extracted from the data model.
  * If modifications are required, it is important to consider if they should be done in the template
@@ -12,8 +13,7 @@ use App\Models\Task;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-class TaskFactory extends Factory
-{
+class TaskFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -26,14 +26,13 @@ class TaskFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         $count = Task::count();
         $next = $count + 1;
 
         sleep(1); // to avoid duplicated time stamps
 
-        return [
+        $res = [
             'name' => $this->faker->name,
             'description' => $this->faker->text,
             'column_id' => Column::inRandomOrder()->first()->id,
@@ -43,8 +42,9 @@ class TaskFactory extends Factory
             'href' => $this->faker->sentence(17),
             'favorite' => $this->faker->boolean,
             'watched' => $this->faker->boolean,
-
         ];
+        $res['image'] = $res['name'];
+        return $res;
     }
 
     /**
@@ -59,8 +59,7 @@ class TaskFactory extends Factory
      * ]
      * @return string[]
      */
-    public function error_cases()
-    {
+    public function error_cases() {
         $scenarios = [];
         // $scenarios[] = ["fields" => [], "errors" => ["name" => "The name field is required."]];
         // $scenarios[] = ["fields" => ["name" => $bad_name], "errors" => ["name" => "The name must not be greater than 255 characters."]];

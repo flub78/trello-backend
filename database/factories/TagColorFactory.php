@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is generated from a template with metadata extracted from the data model.
  * If modifications are required, it is important to consider if they should be done in the template
@@ -13,8 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 
 
-class TagColorFactory extends Factory
-{
+class TagColorFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -28,16 +28,18 @@ class TagColorFactory extends Factory
      * @return array
      */
     public function definition() {
-        $count = TagColor::count ();
+        $count = TagColor::count();
         $next = $count + 1;
-        
-        return [
+
+        $res = [
             'name' => $this->faker->safeColorName(),
-			'color' => $this->faker->hexColor(),
+            'color' => $this->faker->hexColor(),
 
         ];
+        $res['image'] = $res['name'];
+        return $res;
     }
-    
+
     /**
      * return a list of erroneous fields and associated expected errors 
      * [
@@ -50,10 +52,10 @@ class TagColorFactory extends Factory
      * ]
      * @return string[]
      */
-    public function error_cases () {
+    public function error_cases() {
         $scenarios = [];
         // $scenarios[] = ["fields" => [], "errors" => ["name" => "The name field is required."]];
         // $scenarios[] = ["fields" => ["name" => $bad_name], "errors" => ["name" => "The name must not be greater than 255 characters."]];
-       return $scenarios;       
+        return $scenarios;
     }
 }

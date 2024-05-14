@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is generated from a template with metadata extracted from the data model.
  * If modifications are required, it is important to consider if they should be done in the template
@@ -14,8 +15,7 @@ use Illuminate\Http\UploadedFile;
 use App\Models\Task;
 
 
-class ChecklistFactory extends Factory
-{
+class ChecklistFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -29,17 +29,19 @@ class ChecklistFactory extends Factory
      * @return array
      */
     public function definition() {
-        $count = Checklist::count ();
+        $count = Checklist::count();
         $next = $count + 1;
-        
-        return [
+
+        $res = [
             'name' => $this->faker->name,
-			'description' => $this->faker->sentence(8),
-			'task_id' => Task::inRandomOrder()->first()->id,
+            'description' => $this->faker->sentence(8),
+            'task_id' => Task::inRandomOrder()->first()->id,
 
         ];
+        $res['image'] = $res['name'];
+        return $res;
     }
-    
+
     /**
      * return a list of erroneous fields and associated expected errors 
      * [
@@ -52,10 +54,10 @@ class ChecklistFactory extends Factory
      * ]
      * @return string[]
      */
-    public function error_cases () {
+    public function error_cases() {
         $scenarios = [];
         // $scenarios[] = ["fields" => [], "errors" => ["name" => "The name field is required."]];
         // $scenarios[] = ["fields" => ["name" => $bad_name], "errors" => ["name" => "The name must not be greater than 255 characters."]];
-       return $scenarios;       
+        return $scenarios;
     }
 }
