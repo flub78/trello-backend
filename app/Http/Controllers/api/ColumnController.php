@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is generated from a template with metadata extracted from the data model.
  * If modifications are required, it is important to consider if they should be done in the template
@@ -40,7 +41,7 @@ class ColumnController extends Controller {
      * Display a listing of the resource.
      */
     public function index(Request $request) {
-        
+
         try {
             Log::Debug('ColumnController@index');
 
@@ -49,6 +50,8 @@ class ColumnController extends Controller {
                 $queries = UrlQuery::queries($query_string);
             }
             $query = Column::query();
+            $query->join('boards', 'columns.board_id', '=', 'boards.name');
+            $query->select('columns.*', 'boards.name as board_id_image');
 
             // Manage API language
             $this->set_locale($request);
@@ -69,8 +72,7 @@ class ColumnController extends Controller {
                                 $op = 'LIKE';
                                 $value = substr($value, 2);
                                 $value = '%' . $value . '%';
-
-                            } else {                            
+                            } else {
                                 $value = ltrim($value, $op);
                             }
                             $query->where($criteria, $op, $value);
@@ -81,7 +83,6 @@ class ColumnController extends Controller {
                     if (!$operator_found) {
                         $query->where($criteria, $value);
                     }
-
                 }
             }
 
@@ -105,12 +106,10 @@ class ColumnController extends Controller {
                 $per_page = $request->per_page;
 
                 return $query->paginate($per_page);
-
             } else {
                 $elements = $query->get(); // SELECT * FROM columns
                 return response()->json($elements, 200);
             }
-        
         } catch (\Exception $e) {
 
             Log::Error('ColumnController@index', ['message' => $e->getMessage()]);
@@ -120,14 +119,13 @@ class ColumnController extends Controller {
             ];
 
             return response()->json($data, 500);
-        }       
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, $id)
-    {
+    public function show(Request $request, $id) {
         try {
             Log::Debug("ColumnController@show $id");
 
@@ -143,9 +141,10 @@ class ColumnController extends Controller {
                     [
                         'status' => 404,
                         'message' => __('api.not_found', ['elt' => $id])
-                    ], 404);
+                    ],
+                    404
+                );
             }
-
         } catch (\Exception $e) {
 
             Log::Error('ColumnController@show', ['message' => $e->getMessage()]);
@@ -161,8 +160,7 @@ class ColumnController extends Controller {
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         try {
             Log::Debug('ColumnController@store');
 
@@ -171,8 +169,8 @@ class ColumnController extends Controller {
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
-				"board_id" => 'required|string|max:128|exists:boards,name',
-				"tasks" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
+                "board_id" => 'required|string|max:128|exists:boards,name',
+                "tasks" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 
@@ -189,8 +187,8 @@ class ColumnController extends Controller {
 
             $element = new Column;
             $element->name = $request->name;
-			$element->board_id = $request->board_id;
-			$element->tasks = $request->tasks;
+            $element->board_id = $request->board_id;
+            $element->tasks = $request->tasks;
 
             $element->save();
 
@@ -198,10 +196,9 @@ class ColumnController extends Controller {
             $data = [
                 'status' => 201,
                 'column' => $element
-            ];            
+            ];
             Log::Debug('ColumnController@store saved in database', $data);
             return response()->json($element, 201);
-
         } catch (\Exception $e) {
 
             Log::Error('ColumnController@store', ['message' => $e->getMessage()]);
@@ -211,14 +208,13 @@ class ColumnController extends Controller {
             ];
 
             return response()->json($data, 500);
-        }       
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         try {
             Log::Debug("ColumnController@update $id");
 
@@ -227,8 +223,8 @@ class ColumnController extends Controller {
 
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
-				"board_id" => 'string|max:128|exists:boards,name',
-				"tasks" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
+                "board_id" => 'string|max:128|exists:boards,name',
+                "tasks" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 
@@ -245,23 +241,22 @@ class ColumnController extends Controller {
 
             $element = Column::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);                
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
             }
 
             if ($request->exists('name')) {
-				$element->name = $request->name;
-			}
-			if ($request->exists('board_id')) {
-				$element->board_id = $request->board_id;
-			}
-			if ($request->exists('tasks')) {
-				$element->tasks = $request->tasks;
-			}
+                $element->name = $request->name;
+            }
+            if ($request->exists('board_id')) {
+                $element->board_id = $request->board_id;
+            }
+            if ($request->exists('tasks')) {
+                $element->tasks = $request->tasks;
+            }
 
             $element->save();
 
             return response()->json($element, 200);
-
         } catch (\Exception $e) {
 
             Log::Error('ColumnController@update', ['message' => $e->getMessage()]);
@@ -277,18 +272,16 @@ class ColumnController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, $id)
-    {
+    public function destroy(Request $request, $id) {
         try {
             Log::Debug("ColumnController@delete $id");
 
             // Manage API language
             $this->set_locale($request);
-            
+
             $element = Column::find($id);
             if (!$element) {
                 return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
-
             }
 
             $element->delete();
@@ -299,7 +292,6 @@ class ColumnController extends Controller {
             ];
 
             return response()->json($data, 200);
-
         } catch (\Exception $e) {
 
             Log::Error('ColumnController@destroy', ['message' => $e->getMessage()]);
@@ -310,6 +302,5 @@ class ColumnController extends Controller {
 
             return response()->json($data, 500);
         }
-
     }
 }
