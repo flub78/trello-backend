@@ -41,7 +41,6 @@ class BoardFactory extends Factory {
             'theme' => $this->faker->randomElement(['light', 'dark']),
             'lists' => $this->faker->csv_string(6),
         ];
-        $res['image'] = $res['name'];
 
         return $res;
     }

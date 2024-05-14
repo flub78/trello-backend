@@ -43,7 +43,7 @@ class MetadataTableSeeder extends Seeder {
                 'table' => 'boards',
                 'column' => 'lists',
                 'key' => 'json',
-                'value' => '{"subtype":"super_csv_string"}',
+                'value' => '{"subtype":"csv_string"}',
                 'created_at' => NULL,
                 'updated_at' => NULL,
             ),

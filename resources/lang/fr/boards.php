@@ -25,7 +25,7 @@ return [
     'favorite' => 'Favori',
     'read_at' => 'Lu le',
     'href' => 'Lien',
-    'image' => 'Image',
+    'picture' => 'Image de fond',
     'theme' => 'Thème',
     'lists' => 'Listes',
     'created_at' => 'Créé le',
