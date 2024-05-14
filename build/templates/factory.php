@@ -32,9 +32,11 @@ class [[class]]Factory extends Factory
         $count = [[class]]::count ();
         $next = $count + 1;
         
-        return [
+        $res = [
             [[#cg]] factory_field_list [[/cg]]
         ];
+        
+        return $res;
     }
     
     /**

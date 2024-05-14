@@ -14,7 +14,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 
 
-class BoardFactory extends Factory {
+class BoardFactory extends Factory
+{
     /**
      * The name of the factory's corresponding model.
      *

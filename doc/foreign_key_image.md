@@ -22,9 +22,12 @@ To check: is it possible to use laravel validation on computed attributes ?
     https://stackoverflow.com/questions/47168082/how-to-make-a-validation-on-a-calculated-field-in-laravel-5-5
 
 
-## Note
+## Notes
 
 In some contexts, there is no need for the image to be non ambiguous, only to be unique inside the context.
+
+Laravel is really flexible, it is possible to rename primary keys. changes are propagated ...
+So I do not need an image for tables with string primary key.
 
 ## Convention
 
