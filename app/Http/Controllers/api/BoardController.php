@@ -37,7 +37,7 @@ class BoardController extends Controller {
         }
     }
     /**
-     * Display a listing of the resource.
+     * Display a list of the resource.
      */
     public function index(Request $request) {
         
@@ -177,7 +177,7 @@ class BoardController extends Controller {
 				"href" => 'string|max:255',
 				"picture" => 'string|max:255',
 				"theme" => 'in:light,dark',
-				"lists" => 'string|max:255',
+				"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 
@@ -243,7 +243,7 @@ class BoardController extends Controller {
 				"href" => 'string|max:255',
 				"picture" => 'string|max:255',
 				"theme" => 'in:light,dark',
-				"lists" => 'string|max:255',
+				"lists" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
 
             ]);
 

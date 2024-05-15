@@ -1,8 +1,8 @@
 # Code Generation
 
-SOme files of this project are generated using the ddd-gen code generator from https://github.com/flub78/ddd-gen
+Some files of this project are generated using the ddd-gen code generator from https://github.com/flub78/ddd-gen
 
-## Generation
+## Backend files Generation
 
 In a windows console:
 

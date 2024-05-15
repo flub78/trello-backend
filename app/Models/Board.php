@@ -10,7 +10,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Board extends Model
 {
@@ -20,15 +19,6 @@ class Board extends Model
 
     protected $guarded = ["read_at", "created_at", "updated_at"];
 
-    protected $appends = ['image'];
-
     protected $primaryKey = 'name';
     protected $keyType = 'string';
-
-    /**
-     * Image attribute.
-     */
-    protected function getImageAttribute($value) {
-        return 'image: ' . $this->name;
-    }
 }
