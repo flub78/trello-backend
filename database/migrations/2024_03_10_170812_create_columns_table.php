@@ -15,11 +15,12 @@ return new class extends Migration {
             $table->string('board_id', 128)->required();
             $table->string('tasks')->nullable()
                 ->comment('{"subtype": "csv_string"}');
-            $table->string('image')->unique();
 
             $table->foreign('board_id')->references('name')->on('boards')->onUpdate('cascade')->onDelete('cascade');
 
             $table->timestamps();
+
+            $table->index(['name', 'board_id']);
         });
     }
 

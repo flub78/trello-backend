@@ -34,9 +34,9 @@ class DatabaseSeeder extends Seeder {
         // factory-create returns an object but the primary key is not set
 
         // Populate columns
-        $webapp_c1 = Column::factory()->create(["name" => "todo", "board_id" => "webapp", "image" => "ToDo"])->id;
-        $webapp_c2 = Column::factory()->create(["name" => "In progress", "board_id" => "webapp", "image" => "In Progress"])->id;
-        $webapp_c3 = Column::factory()->create(["name" => "done", "board_id" => "webapp", "image" => "Don"])->id;
+        $webapp_c1 = Column::factory()->create(["name" => "todo", "board_id" => "webapp"])->id;
+        $webapp_c2 = Column::factory()->create(["name" => "In progress", "board_id" => "webapp"])->id;
+        $webapp_c3 = Column::factory()->create(["name" => "done", "board_id" => "webapp"])->id;
 
         $webapp_list = implode(", ", ['"' . $webapp_c1 . '"', '"' . $webapp_c2 . '"', '"' . $webapp_c3 . '"']);
 

@@ -32,8 +32,8 @@ class TagColorFactory extends Factory {
         $next = $count + 1;
 
         $res = [
-            'name' => $this->faker->safeColorName(),
-            'color' => $this->faker->hexColor(),
+            'name' => $this->faker->unique()->safeColorName(),
+            'color' => $this->faker->unique()->hexColor(),
 
         ];
         $res['image'] = $res['name'];

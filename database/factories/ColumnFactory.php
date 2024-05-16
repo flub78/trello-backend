@@ -37,7 +37,6 @@ class ColumnFactory extends Factory {
             'board_id' => Board::inRandomOrder()->first()->name,
             'tasks' => $this->faker->csv_string(6),
         ];
-        $res['image'] = $res['name'];
         return $res;
     }
 
