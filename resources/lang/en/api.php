@@ -14,5 +14,6 @@ return [
     'internal_error' => 'Internal server error',
     'validation_error' => 'Validation failed',
     'element_deleted' => 'Element: :elt deleted',
-
+    'duplicate_entry' => 'Duplicated entry',
+    'for_index' => "for index",
 ];
