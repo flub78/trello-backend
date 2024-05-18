@@ -214,13 +214,31 @@ class BoardController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@store', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('BoardController@store', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error'),
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
-            return response()->json($data, 500);
+            return response()->json($data, $status);
         }       
     }
 
@@ -294,10 +312,28 @@ class BoardController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('BoardController@update', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('BoardController@update', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error')
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
             return response()->json($data, 500);

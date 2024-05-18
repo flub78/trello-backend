@@ -50,6 +50,9 @@ class ColumnController extends Controller {
             }
             $query = Column::query();
 
+            $query->join('boards', 'columns.board_id', '=', 'boards.name');
+			$query->select('columns.*', 'boards.name as board_id_image');
+
             // Manage API language
             $this->set_locale($request);
 
@@ -173,7 +176,6 @@ class ColumnController extends Controller {
                 "name" => 'required|string|max:128',
 				"board_id" => 'required|string|max:128|exists:boards,name',
 				"tasks" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
-				"image" => 'required|string|max:255',
 
             ]);
 
@@ -192,7 +194,6 @@ class ColumnController extends Controller {
             $element->name = $request->name;
 			$element->board_id = $request->board_id;
 			$element->tasks = $request->tasks;
-			$element->image = $request->image;
 
             $element->save();
 
@@ -206,13 +207,31 @@ class ColumnController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('ColumnController@store', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('ColumnController@store', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error'),
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
-            return response()->json($data, 500);
+            return response()->json($data, $status);
         }       
     }
 
@@ -231,7 +250,6 @@ class ColumnController extends Controller {
                 "name" => 'string|max:128',
 				"board_id" => 'string|max:128|exists:boards,name',
 				"tasks" => ["string", "max:255", "regex:/\'(.+?)\'|\"(.+?)\"/"],
-				"image" => 'string|max:255',
 
             ]);
 
@@ -260,9 +278,6 @@ class ColumnController extends Controller {
 			if ($request->exists('tasks')) {
 				$element->tasks = $request->tasks;
 			}
-			if ($request->exists('image')) {
-				$element->image = $request->image;
-			}
 
             $element->save();
 
@@ -270,13 +285,32 @@ class ColumnController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('ColumnController@update', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('ColumnController@update', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error')
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
             return response()->json($data, 500);
+
         }
     }
 

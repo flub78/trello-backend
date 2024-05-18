@@ -125,7 +125,8 @@ class ColumnController extends Controller {
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, $id) {
+    public function show(Request $request, $id)
+    {
         try {
             Log::Debug("ColumnController@show $id");
 
@@ -141,9 +142,7 @@ class ColumnController extends Controller {
                     [
                         'status' => 404,
                         'message' => __('api.not_found', ['elt' => $id])
-                    ],
-                    404
-                );
+                    ], 404);
             }
         } catch (\Exception $e) {
 
@@ -160,7 +159,8 @@ class ColumnController extends Controller {
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         try {
             Log::Debug('ColumnController@store');
 
@@ -232,7 +232,8 @@ class ColumnController extends Controller {
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         try {
             Log::Debug("ColumnController@update $id");
 
@@ -308,7 +309,8 @@ class ColumnController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, $id) {
+    public function destroy(Request $request, $id)
+    {
         try {
             Log::Debug("ColumnController@delete $id");
 
