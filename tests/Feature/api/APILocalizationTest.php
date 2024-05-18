@@ -191,7 +191,7 @@ class APILocalizationTest extends TestCase {
 
             // update the created element
             $diff = 0;
-            $high_variability_fields = ["description", "href", "image", "lists"];
+            $high_variability_fields = ["description", "href", "lists"];
 
             foreach ($high_variability_fields as $key) {
                 if ($elt2->$key != $elt1->$key) {
