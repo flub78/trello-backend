@@ -14,20 +14,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class TaskCommentController
  * @package App\Http\Controllers\api
  */
-class TaskCommentController extends Controller
-{
+class TaskCommentController extends Controller {
     //
+    protected function set_locale(Request $request) {
+        if ($request->has('lang')) {
+            $locale = strtolower($request->input('lang'));
+            if ($locale == 'gb') {
+                $locale = 'en';
+            }
 
+            if (in_array($locale, ['en', 'fr'])) {
+                App::setLocale($locale);
+            } else {
+                throw new \Exception('lang = ' . $locale . ' not supported');
+            }
+        }
+    }
     /**
-     * Display a listing of the resource.
+     * Display a list of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
+        
         try {
             Log::Debug('TaskCommentController@index');
 
@@ -37,6 +50,13 @@ class TaskCommentController extends Controller
             }
             $query = TaskComment::query();
 
+            $query->join('tasks', 'task_comments.task_id', '=', 'tasks.id');
+			$query->select('task_comments.*', 'tasks.id as task_id_image');
+
+            // Manage API language
+            $this->set_locale($request);
+
+            // filtering
             if ($request->has('filter')) {
                 $filters = $queries['filter'];
 
@@ -68,6 +88,7 @@ class TaskCommentController extends Controller
                 }
             }
 
+            // sorting
             if ($request->has('sort')) {
                 $sorts = explode(',', $request->input('sort'));
                 Log::Debug('sorting by', $sorts);
@@ -80,6 +101,7 @@ class TaskCommentController extends Controller
                 }
             }
 
+            // pagination
             if ($request->has('per_page') || $request->has('page')) {
                 // request a specific page
                 $page = $request->page;
@@ -97,7 +119,7 @@ class TaskCommentController extends Controller
             Log::Error('TaskCommentController@index', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error'),
             ];
 
             return response()->json($data, 500);
@@ -107,17 +129,24 @@ class TaskCommentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try {
             Log::Debug("TaskCommentController@show $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $element = TaskComment::find($id); // SELECT * FROM task_comments WHERE id = $id 
 
             if ($element) {
                 return response()->json($element, 200);
             } else {
-                return response()->json(['status' => 404, 'message' => "TaskComment $id not found"], 404);
+                return response()->json(
+                    [
+                        'status' => 404,
+                        'message' => __('api.not_found', ['elt' => $id])
+                    ], 404);
             }
 
         } catch (\Exception $e) {
@@ -125,7 +154,7 @@ class TaskCommentController extends Controller
             Log::Error('TaskCommentController@show', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);
@@ -140,6 +169,9 @@ class TaskCommentController extends Controller
         try {
             Log::Debug('TaskCommentController@store');
 
+            // Manage API language
+            $this->set_locale($request);
+
             $validator = Validator::make($request->all(), [
                 "text" => '',
 				"from_email" => 'required|string|max:128|email',
@@ -151,7 +183,7 @@ class TaskCommentController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('TaskCommentController@store validation failed', $data);
 
@@ -175,13 +207,31 @@ class TaskCommentController extends Controller
 
         } catch (\Exception $e) {
 
-            Log::Error('TaskCommentController@store', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('TaskCommentController@store', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => 'Internal Server Error',
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
-            return response()->json($data, 500);
+            return response()->json($data, $status);
         }       
     }
 
@@ -192,6 +242,9 @@ class TaskCommentController extends Controller
     {
         try {
             Log::Debug("TaskCommentController@update $id");
+
+            // Manage API language
+            $this->set_locale($request);
 
             $validator = Validator::make($request->all(), [
                 "text" => '',
@@ -204,7 +257,7 @@ class TaskCommentController extends Controller
                 $data = [
                     'status' => 422,
                     'errors' => $validator->errors(),
-                    'message' => 'Validation failed',
+                    'message' => __('api.validation_error')
                 ];
                 Log::Debug('TaskCommentController@store validation failed', $data);
 
@@ -213,16 +266,16 @@ class TaskCommentController extends Controller
 
             $element = TaskComment::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "TaskComment $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);                
             }
 
-            if ($request->text) {
+            if ($request->exists('text')) {
 				$element->text = $request->text;
 			}
-			if ($request->from_email) {
+			if ($request->exists('from_email')) {
 				$element->from_email = $request->from_email;
 			}
-			if ($request->task_id) {
+			if ($request->exists('task_id')) {
 				$element->task_id = $request->task_id;
 			}
 
@@ -232,34 +285,57 @@ class TaskCommentController extends Controller
 
         } catch (\Exception $e) {
 
-            Log::Error('TaskCommentController@update', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('TaskCommentController@update', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => 'Internal Server Error',
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
             return response()->json($data, 500);
+
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             Log::Debug("TaskCommentController@delete $id");
 
+            // Manage API language
+            $this->set_locale($request);
+            
             $element = TaskComment::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => "TaskComment $id not found"], 404);
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
+
             }
 
             $element->delete();
 
             $data = [
                 'status' => 200,
-                'message' => "TaskComment $id deleted",
+                'message' => __('api.element_deleted', ['elt' => $id])
             ];
 
             return response()->json($data, 200);
@@ -269,7 +345,7 @@ class TaskCommentController extends Controller
             Log::Error('TaskCommentController@destroy', ['message' => $e->getMessage()]);
             $data = [
                 'status' => 500,
-                'error' => 'Internal Server Error',
+                'error' => __('api.internal_error')
             ];
 
             return response()->json($data, 500);

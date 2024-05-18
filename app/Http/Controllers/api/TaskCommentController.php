@@ -37,7 +37,7 @@ class TaskCommentController extends Controller {
         }
     }
     /**
-     * Display a listing of the resource.
+     * Display a list of the resource.
      */
     public function index(Request $request) {
         
@@ -49,6 +49,9 @@ class TaskCommentController extends Controller {
                 $queries = UrlQuery::queries($query_string);
             }
             $query = TaskComment::query();
+
+            $query->join('tasks', 'task_comments.task_id', '=', 'tasks.id');
+			$query->select('task_comments.*', 'tasks.id as task_id_image');
 
             // Manage API language
             $this->set_locale($request);
@@ -204,13 +207,31 @@ class TaskCommentController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('TaskCommentController@store', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('TaskCommentController@store', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error'),
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
-            return response()->json($data, 500);
+            return response()->json($data, $status);
         }       
     }
 
@@ -264,13 +285,32 @@ class TaskCommentController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('TaskCommentController@update', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('TaskCommentController@update', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error')
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
             return response()->json($data, 500);
+
         }
     }
 

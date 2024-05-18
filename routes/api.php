@@ -21,8 +21,8 @@ Route::post('/logout', [App\Http\Controllers\api\AuthController::class, 'logout'
 // All the routes protected by sanctum authentication
 Route::middleware('auth:sanctum')->group(function () {
     // http: //127.0.0.1:8000/api/tag_colors
-    /// Route::resource('/tag-colors', App\Http\Controllers\api\TagColorController::class)
-    /// ->middleware(['auth:sanctum', 'ability:check-status,api-access']);
+    Route::resource('/tag-colors', App\Http\Controllers\api\TagColorController::class)
+        ->middleware(['auth:sanctum', 'ability:check-status,api-access']);
 });
 
 Route::post('/tokens/create', function (Request $request) {
@@ -39,6 +39,6 @@ Route::resource('/columns', App\Http\Controllers\api\ColumnController::class);
 Route::resource('/task-comments', App\Http\Controllers\api\TaskCommentController::class);
 Route::resource('/checklists', App\Http\Controllers\api\ChecklistController::class);
 Route::resource('/checklist-items', App\Http\Controllers\api\ChecklistItemController::class);
-Route::resource('/tag-colors', App\Http\Controllers\api\TagColorController::class);
+// Route::resource('/tag-colors', App\Http\Controllers\api\TagColorController::class);
 Route::resource('/tags', App\Http\Controllers\api\TagController::class);
 Route::resource('/translations', App\Http\Controllers\api\TranslationController::class);

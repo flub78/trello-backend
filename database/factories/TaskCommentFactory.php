@@ -31,13 +31,17 @@ class TaskCommentFactory extends Factory
     public function definition() {
         $count = TaskComment::count ();
         $next = $count + 1;
+
+        sleep(1); // to avoid duplicated time stamps
         
-        return [
+        $res = [
             'text' => $this->faker->text,
 			'from_email' => $this->faker->unique()->safeEmail,
 			'task_id' => Task::inRandomOrder()->first()->id,
 
         ];
+        
+        return $res;
     }
     
     /**
