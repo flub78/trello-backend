@@ -8,18 +8,16 @@
 namespace Tests\Unit;
 
 use App\Models\TagColor;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
 
 /**
  * Test the TagColor model
  */
 class TagColorModelTest extends TestCase
 {
-
-    use RefreshDatabase;
-
     protected $log = true;
 
     /**
@@ -38,28 +36,22 @@ class TagColorModelTest extends TestCase
 
         // Create some elements
         $elt1 = TagColor::factory()->make();
-        $elt1_key = $elt1->id; // if the primary key is provided by the factory
+        $elt1_key = $elt1->id;  // if the primary key is provided by the factory
         $this->assertNotNull($elt1, "the element 1 has been created");
         $this->assertTrue($elt1->save(), "the element 1 has been saved in database");
-        if ('id' == 'id') {$elt1_key = $elt1->id;} // if the primary key is auto incremented
+        if ('id' == 'id')  {$elt1_key = $elt1->id;} // if the primary key is auto incremented
 
         $elt2 = TagColor::factory()->make();
-        $elt2_key = $elt2->id; // if the primary key is provided by the factory
+        $elt2_key = $elt2->id;  // if the primary key is provided by the factory
         $this->assertNotNull($elt2, "the element 2 has been created");
         $this->assertTrue($elt2->save(), "the element 2 has been saved in database");
-        if ('id' == 'id') {
-            $elt2_key = $elt2->id;
-        }
-        // if the primary key is auto incremented
+        if ('id' == 'id') $elt2_key = $elt2->id;   // if the primary key is auto incremented
 
         $elt3 = TagColor::factory()->make();
-        $elt3_key = $elt3->id; // if the primary key is provided by the factory
+        $elt3_key = $elt3->id;  // if the primary key is provided by the factory
         $this->assertNotNull($elt3, "the element 3 has been created");
         $this->assertTrue($elt3->save(), "the element 3 has been saved in database");
-        if ('id' == 'id') {
-            $elt3_key = $elt3->id;
-        }
-        // if the primary key is auto incremented
+        if ('id' == 'id') $elt3_key = $elt3->id;   // if the primary key is auto incremented
 
         $new_count = TagColor::count();
         $this->assertTrue($new_count == $initial_count + 3, "3 elements added to the database");

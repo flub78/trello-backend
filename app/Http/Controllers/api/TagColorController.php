@@ -37,7 +37,7 @@ class TagColorController extends Controller {
         }
     }
     /**
-     * Display a listing of the resource.
+     * Display a list of the resource.
      */
     public function index(Request $request) {
         
@@ -49,6 +49,8 @@ class TagColorController extends Controller {
                 $queries = UrlQuery::queries($query_string);
             }
             $query = TagColor::query();
+
+            
 
             // Manage API language
             $this->set_locale($request);
@@ -172,6 +174,7 @@ class TagColorController extends Controller {
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
 				"color" => 'required|string|max:128',
+				"image" => 'required|string|max:255',
 
             ]);
 
@@ -189,6 +192,7 @@ class TagColorController extends Controller {
             $element = new TagColor;
             $element->name = $request->name;
 			$element->color = $request->color;
+			$element->image = $request->image;
 
             $element->save();
 
@@ -202,13 +206,31 @@ class TagColorController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('TagColorController@store', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('TagColorController@store', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error'),
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
-            return response()->json($data, 500);
+            return response()->json($data, $status);
         }       
     }
 
@@ -226,6 +248,7 @@ class TagColorController extends Controller {
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
 				"color" => 'string|max:128',
+				"image" => 'string|max:255',
 
             ]);
 
@@ -251,6 +274,9 @@ class TagColorController extends Controller {
 			if ($request->exists('color')) {
 				$element->color = $request->color;
 			}
+			if ($request->exists('image')) {
+				$element->image = $request->image;
+			}
 
             $element->save();
 
@@ -258,13 +284,32 @@ class TagColorController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('TagColorController@update', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('TagColorController@update', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error')
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
             return response()->json($data, 500);
+
         }
     }
 

@@ -1,6 +1,6 @@
 # Testing
 
-As this is mainly a REST API server We hae the following tests:
+REST API server tests:
 
 * Unit tests for the model
   * CRUD tests
@@ -34,12 +34,6 @@ The .env.testing file is set.
 Then the database can be migrated
 
     php artisan migrate --seed --env=testing
-
-### Note
-
-It has been observed that the Feature tests for authentication were breaking the database.
-
-At some point I will need a same mode to reset the database before every test. As it will slow test down it should remain an option that can be disabled.
 
 ## Test execution
 

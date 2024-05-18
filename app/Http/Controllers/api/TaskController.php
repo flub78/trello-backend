@@ -37,7 +37,7 @@ class TaskController extends Controller {
         }
     }
     /**
-     * Display a listing of the resource.
+     * Display a list of the resource.
      */
     public function index(Request $request) {
         
@@ -49,6 +49,9 @@ class TaskController extends Controller {
                 $queries = UrlQuery::queries($query_string);
             }
             $query = Task::query();
+
+            $query->join('columns', 'tasks.column_id', '=', 'columns.id');
+			$query->select('tasks.*', 'columns.id as column_id_image');
 
             // Manage API language
             $this->set_locale($request);
@@ -175,10 +178,10 @@ class TaskController extends Controller {
 				"column_id" => 'required|exists:columns,id',
 				"due_date" => 'date',
 				"completed" => 'required|boolean',
-				"image" => 'string|max:255',
 				"href" => 'string|max:255',
 				"favorite" => 'required|boolean',
 				"watched" => 'required|boolean',
+				"image" => 'required|string|max:255',
 
             ]);
 
@@ -199,10 +202,10 @@ class TaskController extends Controller {
 			$element->column_id = $request->column_id;
 			$element->due_date = $request->due_date;
 			$element->completed = $request->completed;
-			$element->image = $request->image;
 			$element->href = $request->href;
 			$element->favorite = $request->favorite;
 			$element->watched = $request->watched;
+			$element->image = $request->image;
 
             $element->save();
 
@@ -216,13 +219,31 @@ class TaskController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('TaskController@store', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('TaskController@store', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error'),
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
-            return response()->json($data, 500);
+            return response()->json($data, $status);
         }       
     }
 
@@ -243,10 +264,10 @@ class TaskController extends Controller {
 				"column_id" => 'exists:columns,id',
 				"due_date" => 'date',
 				"completed" => 'boolean',
-				"image" => 'string|max:255',
 				"href" => 'string|max:255',
 				"favorite" => 'boolean',
 				"watched" => 'boolean',
+				"image" => 'string|max:255',
 
             ]);
 
@@ -281,9 +302,6 @@ class TaskController extends Controller {
 			if ($request->exists('completed')) {
 				$element->completed = $request->completed;
 			}
-			if ($request->exists('image')) {
-				$element->image = $request->image;
-			}
 			if ($request->exists('href')) {
 				$element->href = $request->href;
 			}
@@ -293,6 +311,9 @@ class TaskController extends Controller {
 			if ($request->exists('watched')) {
 				$element->watched = $request->watched;
 			}
+			if ($request->exists('image')) {
+				$element->image = $request->image;
+			}
 
             $element->save();
 
@@ -300,10 +321,28 @@ class TaskController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('TaskController@update', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('TaskController@update', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error')
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
             return response()->json($data, 500);

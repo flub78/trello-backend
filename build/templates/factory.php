@@ -31,6 +31,8 @@ class [[class]]Factory extends Factory
     public function definition() {
         $count = [[class]]::count ();
         $next = $count + 1;
+
+        sleep(1); // to avoid duplicated time stamps
         
         $res = [
             [[#cg]] factory_field_list [[/cg]]

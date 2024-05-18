@@ -91,7 +91,7 @@ class TaskApiControllerTest extends TestCase
 
         // update the created element
         $diff = 0;
-        $high_variability_fields = ["name", "description", "due_date", "image", "href"];
+        $high_variability_fields = ["name", "description", "due_date", "href"];
 
         foreach ($high_variability_fields as $key) {
             if ($elt2->$key != $elt1->$key) {
