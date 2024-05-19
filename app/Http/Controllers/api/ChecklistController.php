@@ -37,7 +37,7 @@ class ChecklistController extends Controller {
         }
     }
     /**
-     * Display a listing of the resource.
+     * Display a list of the resource.
      */
     public function index(Request $request) {
         
@@ -49,6 +49,9 @@ class ChecklistController extends Controller {
                 $queries = UrlQuery::queries($query_string);
             }
             $query = Checklist::query();
+
+            $query->join('tasks', 'checklists.task_id', '=', 'tasks.id');
+			$query->select('checklists.*', 'tasks.id as task_id_image');
 
             // Manage API language
             $this->set_locale($request);
@@ -173,6 +176,7 @@ class ChecklistController extends Controller {
                 "name" => 'required|string|max:128',
 				"description" => 'required|string|max:128',
 				"task_id" => 'required|exists:tasks,id',
+				"image" => 'required|string|max:255',
 
             ]);
 
@@ -191,6 +195,7 @@ class ChecklistController extends Controller {
             $element->name = $request->name;
 			$element->description = $request->description;
 			$element->task_id = $request->task_id;
+			$element->image = $request->image;
 
             $element->save();
 
@@ -204,13 +209,31 @@ class ChecklistController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('ChecklistController@store', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('ChecklistController@store', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error'),
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
-            return response()->json($data, 500);
+            return response()->json($data, $status);
         }       
     }
 
@@ -229,6 +252,7 @@ class ChecklistController extends Controller {
                 "name" => 'string|max:128',
 				"description" => 'string|max:128',
 				"task_id" => 'exists:tasks,id',
+				"image" => 'string|max:255',
 
             ]);
 
@@ -257,6 +281,9 @@ class ChecklistController extends Controller {
 			if ($request->exists('task_id')) {
 				$element->task_id = $request->task_id;
 			}
+			if ($request->exists('image')) {
+				$element->image = $request->image;
+			}
 
             $element->save();
 
@@ -264,10 +291,28 @@ class ChecklistController extends Controller {
 
         } catch (\Exception $e) {
 
-            Log::Error('ChecklistController@update', ['message' => $e->getMessage()]);
+            $message = $e->getMessage();
+            Log::Error('ChecklistController@update', ['message' => $message]);
+
+            $status = 500;
+            $error = __('api.internal_error');
+
+            if (Str::contains($message, 'Integrity constraint violation')) {
+                $status = 422;
+
+                if (Str::contains($message, 'Duplicate entry')) {
+                    $pattern = '/^.*Duplicate entry (.*)for key (.*)\(Connection: (.*), SQL.*$/';
+                    if (preg_match($pattern, $message, $matches)) {
+                        $message = __('api.duplicate_entry') . " " .  $matches[1] . " "
+                            . __('api.for_index') . " " . $matches[2];
+                    }
+                }
+            }
+
             $data = [
-                'status' => 500,
-                'error' => __('api.internal_error')
+                'status' => $status,
+                'error' => $error,
+                'message' => $message
             ];
 
             return response()->json($data, 500);

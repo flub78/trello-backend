@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is generated from a template with metadata extracted from the data model.
  * If modifications are required, it is important to consider if they should be done in the template
@@ -14,18 +15,15 @@ use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-class ChecklistApiControllerTest extends TestCase
-{
+class ChecklistApiControllerTest extends TestCase {
 
-    public function setUp(): void
-    {
+    public function setUp(): void {
         parent::setUp();
         $this->user = User::factory()->create();
         Sanctum::actingAs($this->user, ['api-access']);
     }
 
-    public function tearDown(): void
-    {
+    public function tearDown(): void {
         $this->user->delete();
         parent::tearDown();
     }
@@ -33,8 +31,7 @@ class ChecklistApiControllerTest extends TestCase
     /**
      * A basic test example.
      */
-    public function test_basic_api_access(): void
-    {
+    public function test_basic_api_access(): void {
         $this->base_url = '/api/checklists';
         $response = $this->get($this->base_url);
         $response->assertStatus(200);
@@ -50,8 +47,7 @@ class ChecklistApiControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_api_crud(): void
-    {
+    public function test_api_crud(): void {
         // Read the initial state
         $this->assertTrue(true);
         $this->base_url = '/api/checklists';
@@ -133,6 +129,5 @@ class ChecklistApiControllerTest extends TestCase
         $json = $response->json();
         $final_count = count($json);
         $this->assertTrue($final_count == $initial_count, "back to the initial number of elements");
-
     }
 }

@@ -66,6 +66,10 @@ class TaskController extends Controller {
 
                     list($criteria, $value) = explode(':', $filter, 2);
 
+                    // Should I appen the table name before the criteria ?
+                    // name should become tables.name, etc.
+                    // That could fix the amiguity when several tables in the join have fields with the same name...
+
                     $operator_found = false;
                     foreach (['<=', '>=', '<', '>', '~='] as $op) {
                         if (Str::startsWith($value, $op)) {
