@@ -14,11 +14,9 @@ use Tests\TestCase;
  * and basic CRUD is tested for all the tables,
  * we just need to test that they are working for one table.
  */
-class PageSortFilterApiControllerTest extends TestCase
-{
+class PageSortFilterApiControllerTest extends TestCase {
 
-    public function test_api_sort_and_filter(): void
-    {
+    public function test_api_sort_and_filter(): void {
 
         $this->base_url = '/api/tasks';
 
@@ -66,13 +64,13 @@ class PageSortFilterApiControllerTest extends TestCase
         }
 
         // Get a range of the tasks
-        $response = $this->get($this->base_url . '?filter=name:>Task 2');
+        $response = $this->get($this->base_url . '?filter=tasks.name:>Task 2');
         $head_truncated_json = $response->json();
         $this->assertEquals(4, count($head_truncated_json), 'Expected 4 tasks after head truncation');
         $this->assertEquals('task 3', $head_truncated_json[0]["name"], 'Expected Task 3 to be the first task after head truncation');
 
         // Truncate at both side
-        $response = $this->get($this->base_url . '?filter=name:>Task 2&filter=name:<=Task 5');
+        $response = $this->get($this->base_url . '?filter=tasks.name:>Task 2&filter=tasks.name:<=Task 5');
         $truncated_json = $response->json();
         $this->assertEquals(3, count($truncated_json), 'Expected 4 tasks after truncation');
         $this->assertEquals('task 3', $truncated_json[0]["name"], 'Expected Task 3 to be the first task after truncation');
@@ -91,8 +89,7 @@ class PageSortFilterApiControllerTest extends TestCase
         }
     }
 
-    public function test_api_pagination(): void
-    {
+    public function test_api_pagination(): void {
 
         $this->base_url = '/api/tasks';
 

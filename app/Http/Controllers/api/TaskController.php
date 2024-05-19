@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is generated from a template with metadata extracted from the data model.
  * If modifications are required, it is important to consider if they should be done in the template
@@ -40,7 +41,7 @@ class TaskController extends Controller {
      * Display a list of the resource.
      */
     public function index(Request $request) {
-        
+
         try {
             Log::Debug('TaskController@index');
 
@@ -51,7 +52,7 @@ class TaskController extends Controller {
             $query = Task::query();
 
             $query->join('columns', 'tasks.column_id', '=', 'columns.id');
-			$query->select('tasks.*', 'columns.id as column_id_image');
+            $query->select('tasks.*', 'columns.id as column_id_image');
 
             // Manage API language
             $this->set_locale($request);
@@ -72,8 +73,7 @@ class TaskController extends Controller {
                                 $op = 'LIKE';
                                 $value = substr($value, 2);
                                 $value = '%' . $value . '%';
-
-                            } else {                            
+                            } else {
                                 $value = ltrim($value, $op);
                             }
                             $query->where($criteria, $op, $value);
@@ -84,7 +84,6 @@ class TaskController extends Controller {
                     if (!$operator_found) {
                         $query->where($criteria, $value);
                     }
-
                 }
             }
 
@@ -108,12 +107,10 @@ class TaskController extends Controller {
                 $per_page = $request->per_page;
 
                 return $query->paginate($per_page);
-
             } else {
                 $elements = $query->get(); // SELECT * FROM tasks
                 return response()->json($elements, 200);
             }
-        
         } catch (\Exception $e) {
 
             Log::Error('TaskController@index', ['message' => $e->getMessage()]);
@@ -123,14 +120,13 @@ class TaskController extends Controller {
             ];
 
             return response()->json($data, 500);
-        }       
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, $id)
-    {
+    public function show(Request $request, $id) {
         try {
             Log::Debug("TaskController@show $id");
 
@@ -146,9 +142,10 @@ class TaskController extends Controller {
                     [
                         'status' => 404,
                         'message' => __('api.not_found', ['elt' => $id])
-                    ], 404);
+                    ],
+                    404
+                );
             }
-
         } catch (\Exception $e) {
 
             Log::Error('TaskController@show', ['message' => $e->getMessage()]);
@@ -164,8 +161,7 @@ class TaskController extends Controller {
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         try {
             Log::Debug('TaskController@store');
 
@@ -174,14 +170,14 @@ class TaskController extends Controller {
 
             $validator = Validator::make($request->all(), [
                 "name" => 'required|string|max:128',
-				"description" => '',
-				"column_id" => 'required|exists:columns,id',
-				"due_date" => 'date',
-				"completed" => 'required|boolean',
-				"href" => 'string|max:255',
-				"favorite" => 'required|boolean',
-				"watched" => 'required|boolean',
-				"image" => 'required|string|max:255',
+                "description" => '',
+                "column_id" => 'required|exists:columns,id',
+                "due_date" => 'date',
+                "completed" => 'required|boolean',
+                "href" => 'string|max:255',
+                "favorite" => 'required|boolean',
+                "watched" => 'required|boolean',
+                "image" => 'required|string|max:255',
 
             ]);
 
@@ -198,14 +194,14 @@ class TaskController extends Controller {
 
             $element = new Task;
             $element->name = $request->name;
-			$element->description = $request->description;
-			$element->column_id = $request->column_id;
-			$element->due_date = $request->due_date;
-			$element->completed = $request->completed;
-			$element->href = $request->href;
-			$element->favorite = $request->favorite;
-			$element->watched = $request->watched;
-			$element->image = $request->image;
+            $element->description = $request->description;
+            $element->column_id = $request->column_id;
+            $element->due_date = $request->due_date;
+            $element->completed = $request->completed;
+            $element->href = $request->href;
+            $element->favorite = $request->favorite;
+            $element->watched = $request->watched;
+            $element->image = $request->image;
 
             $element->save();
 
@@ -213,10 +209,9 @@ class TaskController extends Controller {
             $data = [
                 'status' => 201,
                 'task' => $element
-            ];            
+            ];
             Log::Debug('TaskController@store saved in database', $data);
             return response()->json($element, 201);
-
         } catch (\Exception $e) {
 
             $message = $e->getMessage();
@@ -244,14 +239,13 @@ class TaskController extends Controller {
             ];
 
             return response()->json($data, $status);
-        }       
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         try {
             Log::Debug("TaskController@update $id");
 
@@ -260,14 +254,14 @@ class TaskController extends Controller {
 
             $validator = Validator::make($request->all(), [
                 "name" => 'string|max:128',
-				"description" => '',
-				"column_id" => 'exists:columns,id',
-				"due_date" => 'date',
-				"completed" => 'boolean',
-				"href" => 'string|max:255',
-				"favorite" => 'boolean',
-				"watched" => 'boolean',
-				"image" => 'string|max:255',
+                "description" => '',
+                "column_id" => 'exists:columns,id',
+                "due_date" => 'date',
+                "completed" => 'boolean',
+                "href" => 'string|max:255',
+                "favorite" => 'boolean',
+                "watched" => 'boolean',
+                "image" => 'string|max:255',
 
             ]);
 
@@ -284,41 +278,40 @@ class TaskController extends Controller {
 
             $element = Task::find($id);
             if (!$element) {
-                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);                
+                return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
             }
 
             if ($request->exists('name')) {
-				$element->name = $request->name;
-			}
-			if ($request->exists('description')) {
-				$element->description = $request->description;
-			}
-			if ($request->exists('column_id')) {
-				$element->column_id = $request->column_id;
-			}
-			if ($request->exists('due_date')) {
-				$element->due_date = $request->due_date;
-			}
-			if ($request->exists('completed')) {
-				$element->completed = $request->completed;
-			}
-			if ($request->exists('href')) {
-				$element->href = $request->href;
-			}
-			if ($request->exists('favorite')) {
-				$element->favorite = $request->favorite;
-			}
-			if ($request->exists('watched')) {
-				$element->watched = $request->watched;
-			}
-			if ($request->exists('image')) {
-				$element->image = $request->image;
-			}
+                $element->name = $request->name;
+            }
+            if ($request->exists('description')) {
+                $element->description = $request->description;
+            }
+            if ($request->exists('column_id')) {
+                $element->column_id = $request->column_id;
+            }
+            if ($request->exists('due_date')) {
+                $element->due_date = $request->due_date;
+            }
+            if ($request->exists('completed')) {
+                $element->completed = $request->completed;
+            }
+            if ($request->exists('href')) {
+                $element->href = $request->href;
+            }
+            if ($request->exists('favorite')) {
+                $element->favorite = $request->favorite;
+            }
+            if ($request->exists('watched')) {
+                $element->watched = $request->watched;
+            }
+            if ($request->exists('image')) {
+                $element->image = $request->image;
+            }
 
             $element->save();
 
             return response()->json($element, 200);
-
         } catch (\Exception $e) {
 
             $message = $e->getMessage();
@@ -352,18 +345,16 @@ class TaskController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, $id)
-    {
+    public function destroy(Request $request, $id) {
         try {
             Log::Debug("TaskController@delete $id");
 
             // Manage API language
             $this->set_locale($request);
-            
+
             $element = Task::find($id);
             if (!$element) {
                 return response()->json(['status' => 404, 'message' => __('api.not_found', ['elt' => $id])], 404);
-
             }
 
             $element->delete();
@@ -374,7 +365,6 @@ class TaskController extends Controller {
             ];
 
             return response()->json($data, 200);
-
         } catch (\Exception $e) {
 
             Log::Error('TaskController@destroy', ['message' => $e->getMessage()]);
@@ -385,6 +375,5 @@ class TaskController extends Controller {
 
             return response()->json($data, 500);
         }
-
     }
 }

@@ -35,7 +35,7 @@ class TaskCommentApiControllerTest extends TestCase
      */
     public function test_basic_api_access(): void
     {
-        $this->base_url = '/api/task_comments';
+        $this->base_url = '/api/task-comments';
         $response = $this->get($this->base_url);
         $response->assertStatus(200);
 
@@ -54,7 +54,7 @@ class TaskCommentApiControllerTest extends TestCase
     {
         // Read the initial state
         $this->assertTrue(true);
-        $this->base_url = '/api/task_comments';
+        $this->base_url = '/api/task-comments';
         $response = $this->get($this->base_url);
         $response->assertStatus(200);
         $json = $response->json();
