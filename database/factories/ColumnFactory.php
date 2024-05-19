@@ -32,8 +32,14 @@ class ColumnFactory extends Factory {
         $count = Column::count();
         $next = $count + 1;
 
+        sleep(1); // to avoid duplicated time stamps
+
+        // I need to be sure that name plus board_id are unique ...
+
         $res = [
-            'name' => $this->faker->name,
+
+            // this is more strict thant the database constraints ....
+            'name' => $this->faker->unique()->name,
             'board_id' => Board::inRandomOrder()->first()->name,
             'tasks' => $this->faker->csv_string(6),
         ];
