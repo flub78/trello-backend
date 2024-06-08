@@ -1,6 +1,6 @@
 # Devops
 
-Even if this project is developped by only one person there is time to same by deploying de DevOps pipeline.
+Even if this project is developed by only one person there is time to same by deploying de DevOps pipeline.
 
 ## Development process
 
@@ -15,7 +15,7 @@ It is a TDD approach here are the development steps:
 
 ## CI/CD Pipeline
 
-Everytime that some code is checked in.
+Every time that some code is checked in.
 
 * Unit tests are run
 * In case of success
@@ -25,3 +25,16 @@ Everytime that some code is checked in.
   * The project is deployed
 
 
+## Jenkins jobs
+
+https://jenkins2.flub78.net:8443/
+
+
+### Job Creation
+
+* New item
+* Trello_backend_Static_Analysis
+* copy of Multitenant_Static_Analysis
+* set the correct branch
+* create a build-phing.xml
+* 
