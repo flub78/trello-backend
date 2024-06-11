@@ -45,6 +45,7 @@ https://jenkins2.flub78.net:8443/
 * create the vendor directory with composer update
 * install the .env.testing file
 * create the database
+* php artisan 
 
 ## Ansible
 

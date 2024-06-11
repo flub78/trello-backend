@@ -1,55 +1,47 @@
 <?php
 
-namespace tests\Unit\Tenants;
+namespace tests\Unit;
 
 use App\Models\Schema;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 // use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class SchemaModelTest extends TestCase
-{
+class SchemaModelTest extends TestCase {
     // Clean up the database
     use RefreshDatabase;
     // use DatabaseMigrations;
 
-    public function setUp(): void
-    {
+    public function setUp(): void {
         // echo "\nSchemaModelTest setUp";
         parent::setUp();
-
     }
 
-    public function test_table_list()
-    {
+    public function test_table_list() {
         $result = Schema::tableList();
         $this->assertTrue(count($result) > 0);
         $this->assertTrue(in_array('users', $result));
         $this->assertTrue(in_array('migrations', $result));
     }
 
-    public function test_table_exists()
-    {
+    public function test_table_exists() {
         $this->assertTrue(Schema::tableExists('users'));
         $this->assertTrue(Schema::tableExists('migrations'));
         $this->assertFalse(Schema::tableExists('unknow_table'));
     }
 
-    public function test_table_information()
-    {
+    public function test_table_information() {
         $result = Schema::tableInformation("users");
         $this->assertTrue(count($result) > 3);
         $this->assertEquals("id", $result[0]->Field);
     }
 
-    public function test_table_unknow_table()
-    {
+    public function test_table_unknow_table() {
         $result = Schema::tableInformation("unknown_table");
         $this->assertNull($result);
     }
 
-    public function test_field_list()
-    {
+    public function test_field_list() {
         $list = Schema::fieldList("users");
         $this->assertTrue(count($list) > 0);
         $this->assertEquals([
@@ -58,22 +50,19 @@ class SchemaModelTest extends TestCase
         ], $list);
     }
 
-    public function test_field_list_exists()
-    {
+    public function test_field_list_exists() {
         $this->assertTrue(Schema::fieldExists('users', 'email'));
         $this->assertTrue(Schema::fieldExists('users', 'password'));
         $this->assertFalse(Schema::fieldExists('users', 'unknown_field'));
         $this->assertFalse(Schema::fieldExists('unknown', 'unknown_field'));
     }
 
-    public function test_field_list_unknomw_table()
-    {
+    public function test_field_list_unknomw_table() {
         $list = Schema::fieldList("unknown_table");
         $this->assertNull($list);
     }
 
-    public function test_column_information()
-    {
+    public function test_column_information() {
         $info = Schema::columnInformation("users", "id");
         $this->assertNotNull($info);
 
@@ -128,27 +117,23 @@ class SchemaModelTest extends TestCase
     //     $this->assertNull($meta);
     // }
 
-    public function test_column_information_unknown_table()
-    {
+    public function test_column_information_unknown_table() {
         $info = Schema::columnInformation("unknown_table", "key");
         $this->assertNull($info);
     }
 
-    public function test_column_information_unknown_field()
-    {
+    public function test_column_information_unknown_field() {
         $info = Schema::columnInformation("users", "unknown_field");
         $this->assertNull($info);
     }
 
-    public function test_existing_types()
-    {
+    public function test_existing_types() {
         $types = Schema::existingTypes();
         $this->assertTrue(count($types) > 5);
         $this->assertContains('varchar(255)', $types);
     }
 
-    public function test_all()
-    {
+    public function test_all() {
         $cnt = 0;
         $tables = Schema::tableList();
         $txt = "\n";
@@ -168,8 +153,7 @@ class SchemaModelTest extends TestCase
         // echo $txt;
     }
 
-    public function test_attributes()
-    {
+    public function test_attributes() {
         $this->assertEquals('timestamp', Schema::columnType('users', 'created_at'));
         // $this->assertEquals('tinyint(1)', Schema::columnType('users', 'active'));
         $this->assertEquals('varchar(255)', Schema::columnType('users', 'email'));
@@ -196,8 +180,7 @@ class SchemaModelTest extends TestCase
         $this->assertEquals(0, Schema::columnSize('unknown', 'unknown'));
     }
 
-    private function dumpIndex($indexes)
-    {
+    private function dumpIndex($indexes) {
         if (!$indexes) {
             return "";
         }
@@ -214,8 +197,7 @@ class SchemaModelTest extends TestCase
         return $txt;
     }
 
-    public function test_indexes()
-    {
+    public function test_indexes() {
         $txt = $this->dumpIndex(Schema::indexList('users'));
         $txt = $this->dumpIndex(Schema::indexList('user_roles'));
         // echo "\nindexes : \n$txt";
@@ -226,8 +208,7 @@ class SchemaModelTest extends TestCase
         $this->assertNull($il);
     }
 
-    public function test_basic_type()
-    {
+    public function test_basic_type() {
         // tinyint(1)
         // $this->assertEquals('tinyint', Schema::basicType('users', 'active'));
 
@@ -241,8 +222,7 @@ class SchemaModelTest extends TestCase
         // $this->assertEquals('', Schema::basicType('unknown_table', 'unknown_field'));
     }
 
-    public function test_integer_type()
-    {
+    public function test_integer_type() {
         // tinyint(1)
         // $this->assertTrue(Schema::integerType('users', 'active'));
 
@@ -256,8 +236,7 @@ class SchemaModelTest extends TestCase
         $this->assertFalse(Schema::integerType('users', 'unknown'));
     }
 
-    public function test_unsigned_type()
-    {
+    public function test_unsigned_type() {
         // tinyint(1)
         // $this->assertFalse(Schema::unsignedType('users', 'active'));
 
@@ -271,8 +250,7 @@ class SchemaModelTest extends TestCase
         $this->assertFalse(Schema::unsignedType('unknown', 'unknown'));
     }
 
-    public function test_primary_index()
-    {
+    public function test_primary_index() {
         $this->assertEquals('id', Schema::primaryIndex('users'));
         // $this->assertEquals('id', Schema::primaryIndex('user_roles'));
         // $this->assertEquals('key', Schema::primaryIndex('configurations'));
@@ -281,8 +259,7 @@ class SchemaModelTest extends TestCase
         $this->assertEquals('', Schema::primaryIndex('non_existing_table'));
     }
 
-    public function index_info()
-    {
+    public function index_info() {
         $ii = Schema::indexInfo('user_roles', 'user_id');
         $this->assertEquals("user_roles", $ii->Table);
         $this->assertEquals("unique_combination", $ii->Key_name);
@@ -298,8 +275,7 @@ class SchemaModelTest extends TestCase
         $this->assertNull($ii);
     }
 
-    public function foreign_key()
-    {
+    public function foreign_key() {
         $fk = Schema::foreignKey('user_roles', 'user_id');
 
         $this->assertEquals('users', $fk->REFERENCED_TABLE_NAME);
@@ -318,22 +294,19 @@ class SchemaModelTest extends TestCase
         $this->assertNull(Schema::foreignKeyReferencedColumn('user_roles', 'unknown_column'));
     }
 
-    public function test_unique()
-    {
+    public function test_unique() {
         $this->assertFalse(Schema::unique('users', 'name'));
         $this->assertTrue(Schema::unique('users', 'email'));
     }
 
-    public function all_foreign_keys()
-    {
+    public function all_foreign_keys() {
         $this->assertTrue(Schema::isReferenced("users"));
         $this->assertTrue(Schema::isReferenced("roles"));
         $this->assertFalse(Schema::isReferenced("user_roles"));
         $this->assertFalse(Schema::isReferenced("metadata"));
     }
 
-    public function datetime()
-    {
+    public function datetime() {
         $table = "code_gen_types";
         $field = "takeoff";
         $this->assertEquals("datetime", Schema::basicType($table, $field));
@@ -350,8 +323,7 @@ class SchemaModelTest extends TestCase
         $this->assertEquals("time", Schema::columnType($table, $field));
     }
 
-    public function on_constraints()
-    {
+    public function on_constraints() {
         $this->assertEquals("cascade", Schema::onDeleteConstraint("user_roles", "user_id"));
         $this->assertEquals("cascade", Schema::onUpdateConstraint("user_roles", "role_id"));
 
