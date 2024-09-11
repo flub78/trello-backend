@@ -4,11 +4,15 @@ Laravel backend for the Trello project
 
 It is a REST API for boards, lists and tasks.
 
-But it is mainly a workbench to experiment on full stack WEB development.
+It is mainly a workbench to experiment on full stack WEB development.
 
 The idea is to experiment on REST APIs served by Laravel using MySql and to have clients developed in React.
 
 ## Starting a development server
+
+### Pre-requisites
+
+### Launch the server
 
 in development:
 
@@ -17,6 +21,7 @@ in development:
         Start MySql
 
     cd trello-backend
+    SET PATH=C:\xampp_php82\php;C:\Program Files\WinMerge;%PATH%;
     php artisan serve
 
 The project is available at http://127.0.0.1:8000/
@@ -25,7 +30,9 @@ It is then possible to register new users and login.
 
 (Todo: check how to disable registration.)
 
-## Development steps
+## Project Development steps
+
+These are the steps to create a project for a Laravel API server.
 
 - Create the github project (no files)
 - Create a local Laravel project
