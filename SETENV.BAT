@@ -13,6 +13,7 @@ SET WF_INSTALL_DIR=%PROJECT%
 
 set urls=http://localhost/dashboard/, http://localhost/dashboard/phpinfo.php
 
-
+set databases=mysql,information_schema,noexisting_db,multi
+set databases=mysql,information_schema,multi
 
 :: meta
