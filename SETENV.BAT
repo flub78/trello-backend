@@ -11,4 +11,8 @@ SET WF_TEMPLATES_DIR=%PROJECT%\build\templates
 SET WF_BUILD_DIR=%PROJECT%\build\results
 SET WF_INSTALL_DIR=%PROJECT%
 
-meta
+set urls=http://localhost/dashboard/, http://localhost/dashboard/phpinfo.php
+
+
+
+:: meta
