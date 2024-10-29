@@ -1,4 +1,4 @@
-# Issue MysQl
+# MysQl Crashes
 
 On Windows it happens often that the database is corrupted...
 

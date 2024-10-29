@@ -22,6 +22,7 @@ in development:
 
     cd trello-backend
     SET PATH=C:\xampp_php82\php;C:\Program Files\WinMerge;%PATH%;
+    
     php artisan serve
 
 The project is available at http://127.0.0.1:8000/
