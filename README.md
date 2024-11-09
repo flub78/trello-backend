@@ -8,9 +8,27 @@ It is mainly a workbench to experiment on full stack WEB development.
 
 The idea is to experiment on REST APIs served by Laravel using MySql and to have clients developed in React.
 
-## Starting a development server
+## Installation
 
 ### Pre-requisites
+
+- PHP 8.2
+- MySql
+- Composer
+- Apache
+
+### Clone and configure
+
+- clone the sources
+```    
+    composer install
+```
+- create a database
+- edit the .env file
+- run the migrations
+- run the server
+
+## Starting a development server
 
 ### Launch the server
 
@@ -31,7 +49,7 @@ It is then possible to register new users and login.
 
 (Todo: check how to disable registration.)
 
-## Project Development steps
+## Creating a Laravel project from scratch
 
 These are the steps to create a project for a Laravel API server.
 
