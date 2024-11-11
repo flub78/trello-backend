@@ -25,3 +25,4 @@ build/SETENV.BAT
 /build/results
 *.bak
 .env.testing
+.env testing

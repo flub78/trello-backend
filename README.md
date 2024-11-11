@@ -24,13 +24,15 @@ The idea is to experiment on REST APIs served by Laravel using MySql and to have
     composer install
 ```
 - create a database
+- create a database user
 - edit the .env file
 - run the migrations
-- run the server
+```  
+  php artisan migrate
+  php artisan db:seed
+```
 
-## Starting a development server
-
-### Launch the server
+## Start the development server
 
 in development:
 
@@ -48,6 +50,11 @@ The project is available at http://127.0.0.1:8000/
 It is then possible to register new users and login. 
 
 (Todo: check how to disable registration.)
+
+The API is up and running
+
+http://127.0.0.1:8000/api/boards?lang=fr
+
 
 ## Creating a Laravel project from scratch
 
@@ -241,6 +248,11 @@ it creates the file app/database/migrations/2024_03_02_174125_create_boards_tabl
     http://127.0.0.1:8000/api/boards
 
 ## Testing
+
+ ```  
+  php artisan migrate -env=testing
+  php artisan db:seed
+```   
 
     php artisan test --filter=Api	
  	php artisan test --testsuite=Unit
