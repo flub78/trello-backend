@@ -26,3 +26,6 @@ build/SETENV.BAT
 *.bak
 .env.testing
 .env testing
+linux.py
+__pycache__/linux.cpython-312.pyc
+__pycache__/setenv.cpython-312.pyc
