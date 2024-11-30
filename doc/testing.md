@@ -25,8 +25,7 @@ The .env.testing file is set.
     DB_CONNECTION=testing
 
     DB_TEST_PORT=3306
-    DB_TEST_DATABASE=boards_testDB_CONNECTION=testing
-
+    DB_TEST_DATABASE=boards_test
     DB_TEST_USERNAME=boards_test_user
     DB_TEST_PASSWORD=...
 
